@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChessBrain - Desafios de Xadrez 3x3</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Banners de Anúncio - Topo / Header (Monetização) -->
+  <header class="ad-banner ad-header">
+    <div class="ad-placeholder">Espaço de Anúncio (Topo - 728x90)</div>
+  </header>
+
+  <div class="app-layout">
+    
+    <!-- Barra Lateral Esquerda: Anúncio / Perfil -->
+    <aside class="sidebar left-sidebar">
+      <div class="card profile-card">
+        <h3>Jogador</h3>
+        <p id="user-status">Visitante (Não registrado)</p>
+        <button id="btn-login" class="btn-primary">Entrar / Cadastrar</button>
+      </div>
+
+      <div class="ad-banner ad-sidebar">
+        <div class="ad-placeholder">Espaço de Anúncio (Lateral - 160x600)</div>
+      </div>
+    </aside>
+
+    <!-- Área Principal do Jogo -->
+    <main class="game-container">
+      <div class="game-header">
+        <h2 id="challenge-title">Desafio #1</h2>
+        <p id="challenge-desc">Carregando desafio...</p>
+        
+        <div class="game-stats">
+          <div class="stat-box">
+            <span class="label">Tempo</span>
+            <span id="timer" class="value">00:00.0</span>
+          </div>
+          <div class="stat-box">
+            <span class="label">Pontuação</span>
+            <span id="score" class="value">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabuleiro 3x3 -->
+      <div class="board-wrapper">
+        <div id="board" class="board-3x3"></div>
+      </div>
+
+      <div id="game-feedback" class="feedback-msg"></div>
+
+      <div class="game-controls">
+        <button id="btn-reset" class="btn-secondary">Reiniciar Desafio</button>
+        <button id="btn-next" class="btn-primary">Próximo Desafio</button>
+      </div>
+    </main>
+
+    <!-- Barra Lateral Direita: Ranking Geral -->
+    <aside class="sidebar right-sidebar">
+      <div class="card ranking-card">
+        <h3>Ranking Geral 🏆</h3>
+        <!-- Numeração gerada unicamente via lista ordenada CSS/HTML -->
+        <ol id="leaderboard-list">
+          <li><span>MestreXadrez</span> <span>1500 pts</span></li>
+          <li><span>Ana_Play</span> <span>1320 pts</span></li>
+          <li><span>Carlos2026</span> <span>1180 pts</span></li>
+        </ol>
+      </div>
+
+      <div class="ad-banner ad-sidebar">
+        <div class="ad-placeholder">Espaço de Anúncio (Lateral)</div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- Banner Rodapé -->
+  <footer class="ad-banner ad-footer">
+    <div class="ad-placeholder">Espaço de Anúncio (Rodapé - 728x90)</div>
+  </footer>
+
+  <script src="challenges.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
