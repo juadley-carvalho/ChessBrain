@@ -20,7 +20,8 @@
       <div class="card profile-card">
         <h3>Jogador</h3>
         <p id="user-status">Visitante (Não registrado)</p>
-        <button id="btn-login" class="btn-primary">Entrar / Cadastrar</button>
+        <button id="btn-login-modal" class="btn-primary">Entrar / Cadastrar</button>
+        <button id="btn-logout" class="btn-secondary hidden" style="margin-top: 8px;">Sair</button>
       </div>
 
       <div class="ad-banner ad-sidebar">
@@ -31,6 +32,25 @@
     <!-- Área Principal do Jogo -->
     <main class="game-container">
       <div class="game-header">
+        
+        <!-- Seletor de Modo de Jogo -->
+        <div class="mode-selector-container">
+          <label for="select-mode"><strong>Modo de Desafio:</strong></label>
+          <select id="select-mode" class="mode-select">
+            <option value="move">🧩 Movimentação Aleatória</option>
+            <option value="mate-1">⚔️ Mate em 1 Jogada</option>
+            <option value="mate-2">⚔️ Mate em 2 Jogadas</option>
+            <option value="mate-3">⚔️ Mate em 3 Jogadas</option>
+            <option value="mate-4">⚔️ Mate em 4 Jogadas</option>
+            <option value="mate-5">⚔️ Mate em 5 Jogadas</option>
+            <option value="mate-6">⚔️ Mate em 6 Jogadas</option>
+            <option value="mate-7">⚔️ Mate em 7 Jogadas</option>
+            <option value="mate-8">⚔️ Mate em 8 Jogadas</option>
+            <option value="mate-9">⚔️ Mate em 9 Jogadas</option>
+            <option value="mate-10">⚔️ Mate em 10 Jogadas</option>
+          </select>
+        </div>
+
         <h2 id="challenge-title">Desafio #1</h2>
         <p id="challenge-desc">Carregando desafio...</p>
         
@@ -46,16 +66,25 @@
         </div>
       </div>
 
-      <!-- Tabuleiro 3x3 -->
-      <div class="board-wrapper">
-        <div id="board" class="board-3x3"></div>
+      <!-- Área Central do Jogo: Tabuleiro Principal + Miniatura Objetivo -->
+      <div class="game-play-area">
+        <div class="board-wrapper">
+          <div class="board-label">Tabuleiro Atual</div>
+          <div id="board" class="board-3x3"></div>
+        </div>
+
+        <!-- Miniatura do Objetivo -->
+        <div id="target-board-wrapper" class="board-wrapper mini-wrapper hidden">
+          <div class="board-label">Objetivo Alvo</div>
+          <div id="target-board" class="board-3x3 mini-board"></div>
+        </div>
       </div>
 
       <div id="game-feedback" class="feedback-msg"></div>
 
       <div class="game-controls">
         <button id="btn-reset" class="btn-secondary">Reiniciar Desafio</button>
-        <button id="btn-next" class="btn-primary">Próximo Desafio</button>
+        <button id="btn-next" class="btn-primary">Próximo Desafio 🎲</button>
       </div>
     </main>
 
@@ -63,11 +92,8 @@
     <aside class="sidebar right-sidebar">
       <div class="card ranking-card">
         <h3>Ranking Geral 🏆</h3>
-        <!-- Numeração gerada unicamente via lista ordenada CSS/HTML -->
         <ol id="leaderboard-list">
-          <li><span>MestreXadrez</span> <span>1500 pts</span></li>
-          <li><span>Ana_Play</span> <span>1320 pts</span></li>
-          <li><span>Carlos2026</span> <span>1180 pts</span></li>
+          <!-- Carregado dinamicamente via API -->
         </ol>
       </div>
 
@@ -76,6 +102,29 @@
       </div>
     </aside>
 
+  </div>
+
+  <!-- Modal de Autenticação (Login / Cadastro) -->
+  <div id="auth-modal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <h3 id="modal-title">Entrar no ChessBrain</h3>
+      <form id="auth-form">
+        <div class="input-group">
+          <label for="auth-username">Usuário:</label>
+          <input type="text" id="auth-username" required autocomplete="off">
+        </div>
+        <div class="input-group">
+          <label for="auth-password">Senha:</label>
+          <input type="password" id="auth-password" required>
+        </div>
+        <div id="auth-error" class="modal-error"></div>
+        <div class="modal-buttons">
+          <button type="button" id="btn-submit-login" class="btn-primary">Entrar</button>
+          <button type="button" id="btn-submit-register" class="btn-secondary">Cadastrar</button>
+        </div>
+        <button type="button" id="btn-close-modal" class="btn-link">Cancelar</button>
+      </form>
+    </div>
   </div>
 
   <!-- Banner Rodapé -->

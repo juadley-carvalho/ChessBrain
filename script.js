@@ -1,5 +1,5 @@
 /**
- * ChessBrain - Motor de Xadrez 3x3, Drag & Drop Universal (Pointer Events)
+ * ChessBrain - Motor de Xadrez 3x3 com Mini-Tabuleiro de Objetivo e Notação Algébrica
  */
 
 const PIECE_SYMBOLS = {
@@ -7,19 +7,12 @@ const PIECE_SYMBOLS = {
   'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
 };
 
-const COORDS = [
-  ['a3', 'b3', 'c3'],
-  ['a2', 'b2', 'c2'],
-  ['a1', 'b1', 'c1']
-];
-
 class Chess3x3 {
   constructor() {
     this.board = Array(3).fill(null).map(() => Array(3).fill(null));
     this.selectedSquare = null;
     this.legalMoves = [];
 
-    // Estado do Drag & Drop por Pointer Events
     this.draggingState = {
       isDragging: false,
       fromSquare: null,
@@ -27,7 +20,7 @@ class Chess3x3 {
       ghostEl: null
     };
 
-    this.currentChallengeIndex = 0;
+    this.currentChallenge = null;
     this.moveHistory = [];
     this.totalScore = 0;
     this.timerInterval = null;
@@ -35,7 +28,9 @@ class Chess3x3 {
     this.isCompleted = false;
 
     this.initBoardUI();
-    this.loadChallenge(0);
+    this.initTargetBoardUI();
+    this.initModeSelector();
+    this.generateNextChallenge();
   }
 
   initBoardUI() {
@@ -53,8 +48,7 @@ class Chess3x3 {
         square.dataset.col = c;
         square.dataset.coord = COORDS[r][c];
 
-        square.addEventListener('click', (e) => {
-          // Previne clique duplo ao soltar o arraste
+        square.addEventListener('click', () => {
           if (!this.draggingState.isDragging) {
             this.handleSquareClick(r, c);
           }
@@ -64,20 +58,52 @@ class Chess3x3 {
       }
     }
 
-    // Eventos Globais de Movimento de Ponteiro (Mouse & Touch)
     window.addEventListener('pointermove', (e) => this.handlePointerMove(e));
     window.addEventListener('pointerup', (e) => this.handlePointerUp(e));
   }
 
-  loadChallenge(index) {
-    if (index >= CHALLENGES.length) {
-      this.setFeedback('Parabéns! Você concluiu todos os desafios disponíveis.', 'success');
-      return;
+  // Inicializa a grade do mini-tabuleiro objetivo
+  initTargetBoardUI() {
+    const targetBoardEl = document.getElementById('target-board');
+    if (!targetBoardEl) return;
+    targetBoardEl.innerHTML = '';
+
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 3; c++) {
+        const square = document.createElement('div');
+        const isLight = (r + c) % 2 === 0;
+        square.className = `square ${isLight ? 'light' : 'dark'}`;
+        square.dataset.targetRow = r;
+        square.dataset.targetCol = c;
+        targetBoardEl.appendChild(square);
+      }
+    }
+  }
+
+  initModeSelector() {
+    const selectEl = document.getElementById('select-mode');
+    if (selectEl) {
+      selectEl.addEventListener('change', () => {
+        this.generateNextChallenge();
+      });
+    }
+  }
+
+  generateNextChallenge() {
+    const selectEl = document.getElementById('select-mode');
+    const selectedMode = selectEl ? selectEl.value : 'move';
+
+    if (selectedMode === 'move') {
+      this.currentChallenge = ChallengeGenerator.generateRandomMoveChallenge();
+    } else if (selectedMode.startsWith('mate-')) {
+      const mateInX = parseInt(selectedMode.split('-')[1]);
+      this.currentChallenge = ChallengeGenerator.getMateChallenge(mateInX);
     }
 
-    this.currentChallengeIndex = index;
-    const challenge = CHALLENGES[index];
+    this.loadChallenge(this.currentChallenge);
+  }
 
+  loadChallenge(challenge) {
     this.board = challenge.initialBoard.map(row => [...row]);
     this.moveHistory = [];
     this.isCompleted = false;
@@ -86,9 +112,38 @@ class Chess3x3 {
     document.getElementById('challenge-desc').textContent = challenge.description;
     this.setFeedback('');
 
+    // Exibe ou esconde a miniatura do objetivo
+    const targetWrapper = document.getElementById('target-board-wrapper');
+    if (challenge.type === 'move' && challenge.targetBoard) {
+      targetWrapper.classList.remove('hidden');
+      this.renderTargetBoard(challenge.targetBoard);
+    } else {
+      targetWrapper.classList.add('hidden');
+    }
+
     this.clearSelection();
     this.startTimer();
     this.render();
+  }
+
+  // Renderiza as peças no mini-tabuleiro de objetivo
+  renderTargetBoard(targetBoard) {
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 3; c++) {
+        const squareEl = document.querySelector(`[data-target-row="${r}"][data-target-col="${c}"]`);
+        if (!squareEl) continue;
+        squareEl.innerHTML = '';
+
+        const piece = targetBoard[r][c];
+        if (piece) {
+          const pieceEl = document.createElement('div');
+          const isWhite = piece === piece.toUpperCase();
+          pieceEl.className = `piece ${isWhite ? 'white' : 'black'}`;
+          pieceEl.textContent = PIECE_SYMBOLS[piece];
+          squareEl.appendChild(pieceEl);
+        }
+      }
+    }
   }
 
   startTimer() {
@@ -136,7 +191,6 @@ class Chess3x3 {
           pieceEl.className = `piece ${isWhite ? 'white' : 'black'}`;
           pieceEl.textContent = PIECE_SYMBOLS[piece];
 
-          // Inicia o Arraste via Pointer Down (Sempre permitido para peças Brancas)
           if (!this.isCompleted && isWhite) {
             pieceEl.addEventListener('pointerdown', (e) => this.handlePointerDown(e, r, c));
           }
@@ -163,13 +217,11 @@ class Chess3x3 {
   handlePointerDown(e, r, c) {
     if (this.isCompleted) return;
 
-    // Seleciona a casa imediatamente ao clicar/tocar
     this.selectSquare(r, c);
 
     const pieceEl = e.currentTarget;
     this.draggingState = {
       isDragging: false,
-      hasMoved: false,
       fromSquare: { r, c },
       pieceEl: pieceEl,
       startX: e.clientX,
@@ -183,11 +235,9 @@ class Chess3x3 {
     const dx = Math.abs(e.clientX - this.draggingState.startX);
     const dy = Math.abs(e.clientY - this.draggingState.startY);
 
-    // Considera arraste se o movimento for maior que 5 pixels
     if (!this.draggingState.isDragging && (dx > 5 || dy > 5)) {
       this.draggingState.isDragging = true;
 
-      // Cria a peça flutuante que segue o cursor
       const ghost = this.draggingState.pieceEl.cloneNode(true);
       ghost.classList.add('dragging');
       document.body.appendChild(ghost);
@@ -206,7 +256,6 @@ class Chess3x3 {
     if (!this.draggingState.pieceEl) return;
 
     if (this.draggingState.isDragging) {
-      // Identifica sob qual casa do tabuleiro o cursor/dedo foi solto
       const elementUnderCursor = document.elementFromPoint(e.clientX, e.clientY);
       const squareEl = elementUnderCursor ? elementUnderCursor.closest('.square') : null;
 
@@ -221,14 +270,12 @@ class Chess3x3 {
         }
       }
 
-      // Remove a peça flutuante da tela
       if (this.draggingState.ghostEl) {
         this.draggingState.ghostEl.remove();
       }
       this.draggingState.pieceEl.style.opacity = '1';
     }
 
-    // Reseta o estado do arraste
     this.draggingState = {
       isDragging: false,
       fromSquare: null,
@@ -338,7 +385,7 @@ class Chess3x3 {
   }
 
   validateChallenge() {
-    const challenge = CHALLENGES[this.currentChallengeIndex];
+    const challenge = this.currentChallenge;
 
     if (this.hasKingOnBoard(false)) {
       const blackInCheck = this.isKingInCheck(false);
@@ -346,7 +393,7 @@ class Chess3x3 {
 
       if (!blackHasMoves && !blackInCheck) {
         this.setFeedback('Empate por Afogamento! As pretas não têm lances válidos.', 'error');
-        setTimeout(() => this.loadChallenge(this.currentChallengeIndex), 1500);
+        setTimeout(() => this.loadChallenge(this.currentChallenge), 1500);
         return;
       }
     }
@@ -367,7 +414,7 @@ class Chess3x3 {
           expectedMove.to.c !== this.moveHistory[stepIndex].to.c) {
         
         this.setFeedback('Jogada incorreta! Tente novamente.', 'error');
-        setTimeout(() => this.loadChallenge(this.currentChallengeIndex), 1200);
+        setTimeout(() => this.loadChallenge(this.currentChallenge), 1200);
         return;
       }
 
@@ -394,6 +441,9 @@ class Chess3x3 {
 
     document.getElementById('score').textContent = this.totalScore;
     this.setFeedback(`Desafio Concluído! +${pointsGained} pontos`, 'success');
+
+    // Salva a pontuação caso o jogador esteja logado
+    this.saveUserScore();
   }
 
   calculateRawMoves(r, c) {
@@ -491,16 +541,154 @@ class Chess3x3 {
       }
     }
   }
+
+  async saveUserScore() {
+    const currentUser = JSON.parse(localStorage.getItem('chessbrain_user'));
+    if (!currentUser) return;
+
+    try {
+      await fetch('/api/score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: currentUser.username,
+          score: this.totalScore
+        })
+      });
+      // Atualiza o ranking em tempo real
+      this.fetchLeaderboard();
+    } catch (err) {
+      console.error('Erro ao salvar pontuação:', err);
+    }
+  }
+
+  // Carrega o Ranking Geral do Servidor
+  async fetchLeaderboard() {
+    try {
+      const res = await fetch('/api/leaderboard');
+      const data = await res.json();
+
+      const listEl = document.getElementById('leaderboard-list');
+      if (!listEl) return;
+      listEl.innerHTML = '';
+
+      if (data.length === 0) {
+        listEl.innerHTML = '<li><span>Nenhum registro ainda</span></li>';
+        return;
+      }
+
+      data.forEach(item => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${item.username}</span> <span>${item.score} pts</span>`;
+        listEl.appendChild(li);
+      });
+    } catch (err) {
+      console.error('Erro ao carregar ranking:', err);
+    }
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   const game = new Chess3x3();
 
+  // Carrega o Ranking Inicial do Banco de Dados
+  game.fetchLeaderboard();
+
+  // Gerenciamento de Autenticação (LocalStorage + API)
+  const modal = document.getElementById('auth-modal');
+  const userStatusEl = document.getElementById('user-status');
+  const btnLoginModal = document.getElementById('btn-login-modal');
+  const btnLogout = document.getElementById('btn-logout');
+  const authError = document.getElementById('auth-error');
+
+  const updateUIForUser = () => {
+    const user = JSON.parse(localStorage.getItem('chessbrain_user'));
+    if (user) {
+      userStatusEl.textContent = `Jogador: ${user.username}`;
+      btnLoginModal.classList.add('hidden');
+      btnLogout.classList.remove('hidden');
+    } else {
+      userStatusEl.textContent = 'Visitante (Não registrado)';
+      btnLoginModal.classList.remove('hidden');
+      btnLogout.classList.add('hidden');
+    }
+  };
+
+  updateUIForUser();
+
+  btnLoginModal.addEventListener('click', () => {
+    authError.textContent = '';
+    modal.classList.remove('hidden');
+  });
+
+  document.getElementById('btn-close-modal').addEventListener('click', () => {
+    modal.classList.add('hidden');
+  });
+
+  btnLogout.addEventListener('click', () => {
+    localStorage.removeItem('chessbrain_user');
+    updateUIForUser();
+  });
+
+  // Ação de Login
+  document.getElementById('btn-submit-login').addEventListener('click', async () => {
+    const username = document.getElementById('auth-username').value;
+    const password = document.getElementById('auth-password').value;
+
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        authError.textContent = data.error;
+        return;
+      }
+
+      localStorage.setItem('chessbrain_user', JSON.stringify(data.user));
+      updateUIForUser();
+      modal.classList.add('hidden');
+      game.fetchLeaderboard();
+    } catch (err) {
+      authError.textContent = 'Erro ao conectar ao servidor.';
+    }
+  });
+
+  // Ação de Cadastro
+  document.getElementById('btn-submit-register').addEventListener('click', async () => {
+    const username = document.getElementById('auth-username').value;
+    const password = document.getElementById('auth-password').value;
+
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        authError.textContent = data.error;
+        return;
+      }
+
+      localStorage.setItem('chessbrain_user', JSON.stringify(data.user));
+      updateUIForUser();
+      modal.classList.add('hidden');
+      game.fetchLeaderboard();
+    } catch (err) {
+      authError.textContent = 'Erro ao conectar ao servidor.';
+    }
+  });
+
   document.getElementById('btn-reset').addEventListener('click', () => {
-    game.loadChallenge(game.currentChallengeIndex);
+    game.loadChallenge(game.currentChallenge);
   });
 
   document.getElementById('btn-next').addEventListener('click', () => {
-    game.loadChallenge(game.currentChallengeIndex + 1);
+    game.generateNextChallenge();
   });
 });

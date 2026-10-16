@@ -115,6 +115,31 @@ body {
   font-weight: bold;
 }
 
+/* Seletor de Modo de Jogo */
+.mode-selector-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.mode-select {
+  background-color: var(--wood-dark);
+  color: var(--text-color);
+  border: 1px solid var(--wood-medium);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: bold;
+  cursor: pointer;
+  outline: none;
+}
+
+.mode-select:hover {
+  border-color: var(--accent);
+}
+
 /* Área do Jogo e Tabuleiro */
 .game-container {
   flex: 2;
@@ -167,24 +192,24 @@ body {
   color: #fff;
 }
 
-/* Mensagens de Feedback */
-.feedback-msg {
-  margin-top: 12px;
-  font-weight: bold;
-  font-size: 1.1rem;
-  min-height: 24px;
+/* Disposição dos Tabuleiros (Principal + Miniatura) */
+.game-play-area {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.board-label {
   text-align: center;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--accent);
+  margin-bottom: 8px;
 }
 
-.feedback-msg.success {
-  color: var(--success);
-}
-
-.feedback-msg.error {
-  color: var(--error);
-}
-
-/* Tabuleiro 3x3 */
+/* Tabuleiro 3x3 Principal */
 .board-wrapper {
   background-color: var(--wood-dark);
   padding: 15px;
@@ -247,6 +272,32 @@ body {
   pointer-events: none;
 }
 
+/* Miniatura do Tabuleiro Objetivo */
+.mini-wrapper {
+  padding: 10px;
+}
+
+.mini-wrapper.hidden {
+  display: none !important;
+}
+
+.mini-board {
+  grid-template-columns: repeat(3, 45px) !important;
+  grid-template-rows: repeat(3, 45px) !important;
+  border-width: 2px;
+}
+
+.mini-board .square {
+  width: 45px !important;
+  height: 45px !important;
+  cursor: default;
+}
+
+.mini-board .piece {
+  font-size: 1.9rem !important;
+  cursor: default;
+}
+
 /* Peças de Xadrez */
 .piece {
   font-size: 3.8rem;
@@ -274,6 +325,23 @@ body {
 .piece.black {
   color: #1a1a1a;
   text-shadow: 0 1px 3px rgba(255, 255, 255, 0.4);
+}
+
+/* Mensagens de Feedback */
+.feedback-msg {
+  margin-top: 12px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  min-height: 24px;
+  text-align: center;
+}
+
+.feedback-msg.success {
+  color: var(--success);
+}
+
+.feedback-msg.error {
+  color: var(--error);
 }
 
 /* Botões e Ações */
@@ -315,6 +383,10 @@ button {
   .app-layout {
     flex-direction: column;
   }
+
+  .game-play-area {
+    flex-direction: column;
+  }
   
   .board-3x3 {
     grid-template-columns: repeat(3, 75px);
@@ -329,4 +401,95 @@ button {
   .piece {
     font-size: 3.2rem;
   }
+}
+/* Modais de Autenticação */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal-backdrop.hidden {
+  display: none !important;
+}
+
+.modal-card {
+  background-color: var(--panel-bg);
+  border: 3px solid var(--wood-medium);
+  border-radius: 10px;
+  padding: 25px;
+  width: 90%;
+  max-width: 380px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+  text-align: center;
+}
+
+.modal-card h3 {
+  color: var(--accent);
+  margin-bottom: 15px;
+}
+
+.input-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 5px;
+  color: var(--wood-light);
+}
+
+.input-group input {
+  width: 100%;
+  padding: 8px 12px;
+  background-color: var(--bg-color);
+  border: 1px solid var(--wood-medium);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+}
+
+.input-group input:focus {
+  border-color: var(--accent);
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.modal-buttons button {
+  flex: 1;
+}
+
+.modal-error {
+  color: var(--error);
+  font-size: 0.85rem;
+  margin-top: 8px;
+  min-height: 18px;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--wood-light);
+  margin-top: 10px;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none !important;
 }
