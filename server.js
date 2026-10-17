@@ -45,7 +45,7 @@ if (dbPath === defaultDbPath && !fs.existsSync(dbPath) && fs.existsSync(legacyDb
   console.log('📦 Banco movido de ./chessbrain.db para ./data/chessbrain.db');
 }
 
-const db = new sqlite3.Database(dbPath, (err) => {
+const db = new sqlite3.Database(dbPath, err => {
   if (err) {
     console.error('Erro ao abrir o banco de dados:', err.message);
     process.exit(1);
@@ -78,7 +78,7 @@ function initDatabase(onReady) {
       )
     `);
 
-    db.run(`DELETE FROM sessions WHERE expires_at < ?`, [Date.now()], (err) => {
+    db.run(`DELETE FROM sessions WHERE expires_at < ?`, [Date.now()], err => {
       if (err) {
         console.error('Erro ao preparar o banco de dados:', err.message);
         process.exit(1);
@@ -113,21 +113,17 @@ function createSession(req, res, userId, callback) {
   const token = crypto.randomBytes(32).toString('hex');
   const expiresAt = Date.now() + SESSION_TTL_MS;
 
-  db.run(
-    `INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)`,
-    [token, userId, expiresAt],
-    (err) => {
-      if (err) return callback(err);
-      res.cookie(SESSION_COOKIE, token, {
-        httpOnly: true,
-        sameSite: 'strict',
-        secure: req.secure,
-        maxAge: SESSION_TTL_MS,
-        path: '/'
-      });
-      callback(null);
-    }
-  );
+  db.run(`INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)`, [token, userId, expiresAt], err => {
+    if (err) return callback(err);
+    res.cookie(SESSION_COOKIE, token, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: req.secure,
+      maxAge: SESSION_TTL_MS,
+      path: '/'
+    });
+    callback(null);
+  });
 }
 
 // Carrega o usuário da sessão em req.user (ou null)
@@ -196,7 +192,7 @@ app.post('/api/register', async (req, res) => {
     }
 
     const userId = this.lastID;
-    createSession(req, res, userId, (sessionErr) => {
+    createSession(req, res, userId, sessionErr => {
       if (sessionErr) {
         return res.status(500).json({ error: 'Erro ao criar sessão.' });
       }
@@ -224,7 +220,7 @@ app.post('/api/login', (req, res) => {
 
     let passwordOk = false;
     try {
-      passwordOk = !!user && await bcrypt.compare(password, user.password);
+      passwordOk = !!user && (await bcrypt.compare(password, user.password));
     } catch {
       return res.status(500).json({ error: 'Erro ao validar senha.' });
     }
@@ -232,7 +228,7 @@ app.post('/api/login', (req, res) => {
       return res.status(401).json({ error: 'Usuário ou senha inválidos.' });
     }
 
-    createSession(req, res, user.id, (sessionErr) => {
+    createSession(req, res, user.id, sessionErr => {
       if (sessionErr) {
         return res.status(500).json({ error: 'Erro ao criar sessão.' });
       }
@@ -254,7 +250,7 @@ app.post('/api/logout', (req, res) => {
   res.clearCookie(SESSION_COOKIE, { path: '/' });
   if (!req.sessionToken) return res.json({ success: true });
 
-  db.run(`DELETE FROM sessions WHERE token = ?`, [req.sessionToken], (err) => {
+  db.run(`DELETE FROM sessions WHERE token = ?`, [req.sessionToken], err => {
     if (err) return res.status(500).json({ error: 'Erro ao encerrar sessão.' });
     res.json({ success: true });
   });
@@ -270,7 +266,7 @@ app.post('/api/score', requireAuth, (req, res) => {
 
   // A pontuação é acumulada: cada desafio soma ao total salvo
   const query = `UPDATE users SET score = score + ? WHERE id = ?`;
-  db.run(query, [points, req.user.id], (err) => {
+  db.run(query, [points, req.user.id], err => {
     if (err) {
       return res.status(500).json({ error: 'Erro ao atualizar pontuação.' });
     }

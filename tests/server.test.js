@@ -59,7 +59,10 @@ test('cadastro, pontuação, sessão e logout', async () => {
   assert.equal(score2.score, 500);
 
   const ranking = await (await fetch(`${BASE}/api/leaderboard`)).json();
-  assert.deepEqual(ranking.find(r => r.username === 'teste_1'), { username: 'teste_1', score: 500 });
+  assert.deepEqual(
+    ranking.find(r => r.username === 'teste_1'),
+    { username: 'teste_1', score: 500 }
+  );
 
   await post('/api/logout', {}, cookie);
   const after = await (await fetch(`${BASE}/api/me`, { headers: { Cookie: cookie } })).json();

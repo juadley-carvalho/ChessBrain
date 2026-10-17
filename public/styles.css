@@ -46,9 +46,7 @@ body {
   line-height: 1.45;
   background:
     radial-gradient(ellipse at 50% 0%, rgba(110, 69, 38, 0.35), transparent 60%),
-    radial-gradient(ellipse at 50% 120%, rgba(0, 0, 0, 0.7), transparent 60%),
-    var(--grain),
-    var(--bg-color);
+    radial-gradient(ellipse at 50% 120%, rgba(0, 0, 0, 0.7), transparent 60%), var(--grain), var(--bg-color);
   background-attachment: fixed;
   color: var(--text-color);
   display: flex;
@@ -58,7 +56,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h2, h3, .board-label, .stat-box .label, .mode-selector-container label {
+h2,
+h3,
+.board-label,
+.stat-box .label,
+.mode-selector-container label {
   font-family: var(--font-display);
   letter-spacing: 0.06em;
 }
@@ -81,7 +83,8 @@ h2, h3, .board-label, .stat-box .label, .mode-selector-container label {
   text-align: center;
 }
 
-.ad-header, .ad-footer {
+.ad-header,
+.ad-footer {
   width: 100%;
   max-width: 1000px;
   min-height: 70px;
@@ -114,10 +117,7 @@ h2, h3, .board-label, .stat-box .label, .mode-selector-container label {
 .card,
 .game-container,
 .modal-card {
-  background:
-    linear-gradient(180deg, rgba(255, 220, 170, 0.05), rgba(0, 0, 0, 0.25)),
-    var(--grain),
-    var(--panel-bg);
+  background: linear-gradient(180deg, rgba(255, 220, 170, 0.05), rgba(0, 0, 0, 0.25)), var(--grain), var(--panel-bg);
   border: 1px solid #000;
   box-shadow:
     0 0 0 1px rgba(212, 165, 87, 0.18) inset,
@@ -233,7 +233,9 @@ h2, h3, .board-label, .stat-box .label, .mode-selector-container label {
   font-size: 1.5rem;
   font-weight: 700;
   color: #f6e3c3;
-  text-shadow: 0 2px 0 #000, 0 0 18px rgba(212, 165, 87, 0.25);
+  text-shadow:
+    0 2px 0 #000,
+    0 0 18px rgba(212, 165, 87, 0.25);
 }
 
 #challenge-desc {
@@ -252,7 +254,9 @@ h2, h3, .board-label, .stat-box .label, .mode-selector-container label {
 .stat-box {
   background: linear-gradient(180deg, #160e07, #22150b);
   border: 1px solid #000;
-  box-shadow: 0 0 0 1px rgba(212, 165, 87, 0.2) inset, inset 0 2px 6px rgba(0, 0, 0, 0.6);
+  box-shadow:
+    0 0 0 1px rgba(212, 165, 87, 0.2) inset,
+    inset 0 2px 6px rgba(0, 0, 0, 0.6);
   padding: 7px 18px;
   border-radius: 8px;
   min-width: 92px;
@@ -295,10 +299,7 @@ h2, h3, .board-label, .stat-box .label, .mode-selector-container label {
 
 /* Moldura do tabuleiro em madeira envernizada */
 .board-wrapper {
-  background:
-    linear-gradient(180deg, rgba(255, 210, 150, 0.12), rgba(0, 0, 0, 0.3)),
-    var(--grain),
-    #4a2c17;
+  background: linear-gradient(180deg, rgba(255, 210, 150, 0.12), rgba(0, 0, 0, 0.3)), var(--grain), #4a2c17;
   padding: 14px 16px 18px;
   border-radius: 12px;
   border: 1px solid #000;
@@ -317,7 +318,9 @@ h2, h3, .board-label, .stat-box .label, .mode-selector-container label {
   border: 3px solid #1a0f07;
   border-radius: 3px;
   overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(212, 165, 87, 0.45), inset 0 0 12px rgba(0, 0, 0, 0.35);
+  box-shadow:
+    0 0 0 1px rgba(212, 165, 87, 0.45),
+    inset 0 0 12px rgba(0, 0, 0, 0.35);
 }
 
 .square {
@@ -330,9 +333,7 @@ h2, h3, .board-label, .stat-box .label, .mode-selector-container label {
   cursor: pointer;
   transition: background-color 0.15s ease;
   touch-action: none;
-  background-image:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.08)),
-    var(--grain-fine);
+  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.08)), var(--grain-fine);
 }
 
 .square.light {
@@ -501,7 +502,9 @@ button {
   border-radius: 7px;
   font-weight: 700;
   cursor: pointer;
-  transition: filter 0.15s, transform 0.05s;
+  transition:
+    filter 0.15s,
+    transform 0.05s;
 }
 
 button:active {
@@ -517,7 +520,9 @@ button:focus-visible {
 .btn-primary {
   background: linear-gradient(180deg, #e7b965 0%, #c48a34 55%, #9c6620 100%);
   color: #23140a;
-  box-shadow: inset 0 1px 0 rgba(255, 245, 210, 0.6), 0 3px 8px rgba(0, 0, 0, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 245, 210, 0.6),
+    0 3px 8px rgba(0, 0, 0, 0.5);
   text-shadow: 0 1px 0 rgba(255, 235, 190, 0.45);
 }
 
@@ -527,12 +532,11 @@ button:focus-visible {
 
 /* Madeira */
 .btn-secondary {
-  background:
-    linear-gradient(180deg, rgba(255, 220, 170, 0.14), rgba(0, 0, 0, 0.2)),
-    var(--grain),
-    var(--wood-warm);
+  background: linear-gradient(180deg, rgba(255, 220, 170, 0.14), rgba(0, 0, 0, 0.2)), var(--grain), var(--wood-warm);
   color: var(--text-color);
-  box-shadow: inset 0 1px 0 rgba(255, 220, 170, 0.2), 0 3px 8px rgba(0, 0, 0, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 170, 0.2),
+    0 3px 8px rgba(0, 0, 0, 0.5);
 }
 
 .btn-secondary:hover {

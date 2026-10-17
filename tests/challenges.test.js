@@ -13,7 +13,9 @@ test('todos os puzzles de MATE_PUZZLES_DATABASE são válidos', () => {
 });
 
 test('IDs dos puzzles são únicos', () => {
-  const ids = Object.values(MATE_PUZZLES_DATABASE).flat().map(p => p.id);
+  const ids = Object.values(MATE_PUZZLES_DATABASE)
+    .flat()
+    .map(p => p.id);
   assert.equal(new Set(ids).size, ids.length);
 });
 

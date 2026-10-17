@@ -4,7 +4,7 @@ const E = require('../public/engine.js');
 
 // Monta o tabuleiro a partir de 3 linhas ('.' = vazia), da linha 3 para a linha 1
 const board = (...rows) => rows.map(row => [...row].map(p => (p === '.' ? null : p)));
-const targets = (moves) => moves.map(m => E.COORDS[m.r][m.c]).sort();
+const targets = moves => moves.map(m => E.COORDS[m.r][m.c]).sort();
 
 test('COORDS segue a notação do README', () => {
   assert.equal(E.COORDS[0][0], 'a3');

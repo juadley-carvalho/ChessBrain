@@ -40,7 +40,7 @@ class ChallengeGenerator {
       return {
         id: `move-${++this.moveChallengeCount}`,
         title: `Desafio de Movimentação (Aleatório)`,
-        type: "move",
+        type: 'move',
         description: `Posicione as peças em: ${targetNotations.join(', ')} — mínimo de ${distance} lances`,
         minMoves: distance,
         initialBoard,
@@ -62,7 +62,9 @@ class ChallengeGenerator {
 
   // Coloca as peças em casas aleatórias; o peão começa na linha do meio para ter lances
   static randomPlacement(pieces) {
-    const board = Array(3).fill(null).map(() => Array(3).fill(null));
+    const board = Array(3)
+      .fill(null)
+      .map(() => Array(3).fill(null));
     const free = [];
     for (let r = 0; r < 3; r++) {
       for (let c = 0; c < 3; c++) free.push({ r, c });
@@ -133,81 +135,71 @@ const MATE_PUZZLES_DATABASE = {
   1: [
     {
       id: 101,
-      title: "Mate em 1 Jogada",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 1 lance!",
+      title: 'Mate em 1 Jogada',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 1 lance!',
       initialBoard: [
         ['K', null, 'N'],
         [null, null, null],
         ['k', null, 'N']
       ],
-      solution: [
-        { from: { r: 2, c: 2 }, to: { r: 0, c: 1 } }
-      ]
+      solution: [{ from: { r: 2, c: 2 }, to: { r: 0, c: 1 } }]
     },
     {
       id: 102,
-      title: "Mate em 1 Jogada",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 1 lance!",
+      title: 'Mate em 1 Jogada',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 1 lance!',
       initialBoard: [
         ['Q', 'K', null],
         [null, null, null],
         ['N', 'k', null]
       ],
-      solution: [
-        { from: { r: 0, c: 0 }, to: { r: 1, c: 1 } }
-      ]
+      solution: [{ from: { r: 0, c: 0 }, to: { r: 1, c: 1 } }]
     },
     {
       id: 103,
-      title: "Mate em 1 Jogada",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 1 lance!",
+      title: 'Mate em 1 Jogada',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 1 lance!',
       initialBoard: [
         ['K', 'r', 'Q'],
         [null, 'R', null],
         ['k', null, null]
       ],
-      solution: [
-        { from: { r: 1, c: 1 }, to: { r: 0, c: 1 } }
-      ]
+      solution: [{ from: { r: 1, c: 1 }, to: { r: 0, c: 1 } }]
     },
     {
       id: 104,
-      title: "Mate em 1 Jogada",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 1 lance!",
+      title: 'Mate em 1 Jogada',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 1 lance!',
       initialBoard: [
         [null, 'K', null],
         ['Q', null, 'N'],
         ['n', null, 'k']
       ],
-      solution: [
-        { from: { r: 1, c: 0 }, to: { r: 2, c: 0 } }
-      ]
+      solution: [{ from: { r: 1, c: 0 }, to: { r: 2, c: 0 } }]
     },
     {
       id: 105,
-      title: "Mate em 1 Jogada",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 1 lance!",
+      title: 'Mate em 1 Jogada',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 1 lance!',
       initialBoard: [
         ['K', null, 'n'],
         [null, null, 'B'],
         ['k', null, 'N']
       ],
-      solution: [
-        { from: { r: 2, c: 2 }, to: { r: 0, c: 1 } }
-      ]
+      solution: [{ from: { r: 2, c: 2 }, to: { r: 0, c: 1 } }]
     }
   ],
   2: [
     {
       id: 201,
-      title: "Mate em 2 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 2 lances!",
+      title: 'Mate em 2 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 2 lances!',
       initialBoard: [
         ['B', 'K', null],
         ['n', null, null],
@@ -217,15 +209,13 @@ const MATE_PUZZLES_DATABASE = {
         { from: { r: 0, c: 1 }, to: { r: 1, c: 2 } },
         { from: { r: 0, c: 0 }, to: { r: 1, c: 1 } }
       ],
-      blackResponses: [
-        { from: { r: 1, c: 0 }, to: { r: 0, c: 2 } }
-      ]
+      blackResponses: [{ from: { r: 1, c: 0 }, to: { r: 0, c: 2 } }]
     },
     {
       id: 202,
-      title: "Mate em 2 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 2 lances!",
+      title: 'Mate em 2 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 2 lances!',
       initialBoard: [
         ['K', null, 'N'],
         [null, 'R', null],
@@ -235,15 +225,13 @@ const MATE_PUZZLES_DATABASE = {
         { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
         { from: { r: 0, c: 2 }, to: { r: 1, c: 0 } }
       ],
-      blackResponses: [
-        { from: { r: 2, c: 1 }, to: { r: 1, c: 0 } }
-      ]
+      blackResponses: [{ from: { r: 2, c: 1 }, to: { r: 1, c: 0 } }]
     },
     {
       id: 203,
-      title: "Mate em 2 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 2 lances!",
+      title: 'Mate em 2 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 2 lances!',
       initialBoard: [
         ['K', 'R', null],
         ['b', null, 'k'],
@@ -253,15 +241,13 @@ const MATE_PUZZLES_DATABASE = {
         { from: { r: 0, c: 0 }, to: { r: 1, c: 0 } },
         { from: { r: 0, c: 1 }, to: { r: 0, c: 2 } }
       ],
-      blackResponses: [
-        { from: { r: 1, c: 2 }, to: { r: 2, c: 2 } }
-      ]
+      blackResponses: [{ from: { r: 1, c: 2 }, to: { r: 2, c: 2 } }]
     },
     {
       id: 204,
-      title: "Mate em 2 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 2 lances!",
+      title: 'Mate em 2 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 2 lances!',
       initialBoard: [
         ['Q', 'K', null],
         ['R', null, null],
@@ -271,15 +257,13 @@ const MATE_PUZZLES_DATABASE = {
         { from: { r: 0, c: 0 }, to: { r: 2, c: 2 } },
         { from: { r: 1, c: 0 }, to: { r: 2, c: 0 } }
       ],
-      blackResponses: [
-        { from: { r: 2, c: 1 }, to: { r: 2, c: 2 } }
-      ]
+      blackResponses: [{ from: { r: 2, c: 1 }, to: { r: 2, c: 2 } }]
     },
     {
       id: 205,
-      title: "Mate em 2 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 2 lances!",
+      title: 'Mate em 2 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 2 lances!',
       initialBoard: [
         ['K', null, 'R'],
         [null, null, null],
@@ -289,17 +273,15 @@ const MATE_PUZZLES_DATABASE = {
         { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
         { from: { r: 0, c: 2 }, to: { r: 2, c: 2 } }
       ],
-      blackResponses: [
-        { from: { r: 2, c: 1 }, to: { r: 2, c: 0 } }
-      ]
+      blackResponses: [{ from: { r: 2, c: 1 }, to: { r: 2, c: 0 } }]
     }
   ],
   3: [
     {
       id: 301,
-      title: "Mate em 3 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 3 lances!",
+      title: 'Mate em 3 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 3 lances!',
       initialBoard: [
         ['K', null, 'Q'],
         ['n', 'B', null],
@@ -317,9 +299,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 302,
-      title: "Mate em 3 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 3 lances!",
+      title: 'Mate em 3 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 3 lances!',
       initialBoard: [
         ['K', 'R', null],
         [null, null, 'k'],
@@ -337,9 +319,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 303,
-      title: "Mate em 3 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 3 lances!",
+      title: 'Mate em 3 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 3 lances!',
       initialBoard: [
         ['K', 'R', null],
         [null, 'n', null],
@@ -357,9 +339,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 304,
-      title: "Mate em 3 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 3 lances!",
+      title: 'Mate em 3 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 3 lances!',
       initialBoard: [
         ['K', 'N', null],
         ['n', null, 'k'],
@@ -377,9 +359,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 305,
-      title: "Mate em 3 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 3 lances!",
+      title: 'Mate em 3 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 3 lances!',
       initialBoard: [
         ['K', 'R', 'b'],
         [null, null, null],
@@ -399,9 +381,9 @@ const MATE_PUZZLES_DATABASE = {
   4: [
     {
       id: 401,
-      title: "Mate em 4 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 4 lances!",
+      title: 'Mate em 4 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 4 lances!',
       initialBoard: [
         ['K', 'b', 'B'],
         [null, null, null],
@@ -421,9 +403,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 402,
-      title: "Mate em 4 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 4 lances!",
+      title: 'Mate em 4 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 4 lances!',
       initialBoard: [
         ['K', 'R', 'b'],
         ['B', null, 'k'],
@@ -443,9 +425,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 403,
-      title: "Mate em 4 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 4 lances!",
+      title: 'Mate em 4 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 4 lances!',
       initialBoard: [
         ['K', 'R', null],
         [null, null, 'N'],
@@ -465,9 +447,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 404,
-      title: "Mate em 4 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 4 lances!",
+      title: 'Mate em 4 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 4 lances!',
       initialBoard: [
         ['K', null, null],
         [null, null, 'R'],
@@ -487,9 +469,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 405,
-      title: "Mate em 4 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 4 lances!",
+      title: 'Mate em 4 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 4 lances!',
       initialBoard: [
         ['K', 'Q', null],
         [null, 'R', null],
@@ -511,9 +493,9 @@ const MATE_PUZZLES_DATABASE = {
   5: [
     {
       id: 501,
-      title: "Mate em 5 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 5 lances!",
+      title: 'Mate em 5 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 5 lances!',
       initialBoard: [
         ['K', null, 'B'],
         [null, null, 'R'],
@@ -535,9 +517,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 502,
-      title: "Mate em 5 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 5 lances!",
+      title: 'Mate em 5 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 5 lances!',
       initialBoard: [
         ['B', 'K', null],
         [null, 'b', null],
@@ -559,9 +541,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 503,
-      title: "Mate em 5 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 5 lances!",
+      title: 'Mate em 5 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 5 lances!',
       initialBoard: [
         ['K', null, 'B'],
         [null, null, 'R'],
@@ -583,9 +565,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 504,
-      title: "Mate em 5 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 5 lances!",
+      title: 'Mate em 5 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 5 lances!',
       initialBoard: [
         ['K', 'N', 'B'],
         [null, null, null],
@@ -607,9 +589,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 505,
-      title: "Mate em 5 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 5 lances!",
+      title: 'Mate em 5 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 5 lances!',
       initialBoard: [
         ['K', null, 'R'],
         ['b', null, null],
@@ -633,9 +615,9 @@ const MATE_PUZZLES_DATABASE = {
   6: [
     {
       id: 601,
-      title: "Mate em 6 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 6 lances!",
+      title: 'Mate em 6 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 6 lances!',
       initialBoard: [
         ['K', null, 'B'],
         ['N', null, 'k'],
@@ -659,9 +641,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 602,
-      title: "Mate em 6 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 6 lances!",
+      title: 'Mate em 6 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 6 lances!',
       initialBoard: [
         ['K', null, 'B'],
         ['N', null, 'k'],
@@ -685,9 +667,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 603,
-      title: "Mate em 6 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 6 lances!",
+      title: 'Mate em 6 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 6 lances!',
       initialBoard: [
         ['K', null, 'B'],
         ['b', null, 'k'],
@@ -711,9 +693,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 604,
-      title: "Mate em 6 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 6 lances!",
+      title: 'Mate em 6 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 6 lances!',
       initialBoard: [
         ['K', null, 'B'],
         [null, 'r', 'k'],
@@ -737,9 +719,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 605,
-      title: "Mate em 6 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 6 lances!",
+      title: 'Mate em 6 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 6 lances!',
       initialBoard: [
         ['K', null, 'k'],
         [null, null, 'b'],
@@ -765,9 +747,9 @@ const MATE_PUZZLES_DATABASE = {
   7: [
     {
       id: 701,
-      title: "Mate em 7 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 7 lances!",
+      title: 'Mate em 7 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 7 lances!',
       initialBoard: [
         ['K', 'N', 'B'],
         [null, null, 'k'],
@@ -793,9 +775,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 702,
-      title: "Mate em 7 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 7 lances!",
+      title: 'Mate em 7 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 7 lances!',
       initialBoard: [
         ['K', 'N', 'k'],
         [null, null, null],
@@ -821,9 +803,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 703,
-      title: "Mate em 7 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 7 lances!",
+      title: 'Mate em 7 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 7 lances!',
       initialBoard: [
         ['B', 'K', null],
         [null, null, 'N'],
@@ -849,9 +831,9 @@ const MATE_PUZZLES_DATABASE = {
     },
     {
       id: 704,
-      title: "Mate em 7 Jogadas",
-      type: "mate",
-      description: "As Brancas jogam e dão Xeque-Mate em 7 lances!",
+      title: 'Mate em 7 Jogadas',
+      type: 'mate',
+      description: 'As Brancas jogam e dão Xeque-Mate em 7 lances!',
       initialBoard: [
         ['B', 'K', 'r'],
         [null, null, 'N'],

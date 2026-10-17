@@ -22,8 +22,17 @@ const path = require('path');
 const vm = require('vm');
 
 const {
-  COORDS, boardKey, isKingInCheck, applyMove, legalMoves, isMate, isStalemate, sameMove,
-  mateDistance, mateMoves, bestDefenses
+  COORDS,
+  boardKey,
+  isKingInCheck,
+  applyMove,
+  legalMoves,
+  isMate,
+  isStalemate,
+  sameMove,
+  mateDistance,
+  mateMoves,
+  bestDefenses
 } = require('../public/engine.js');
 
 const notation = (board, m) => `${board[m.from.r][m.from.c]}${COORDS[m.from.r][m.from.c]}-${COORDS[m.to.r][m.to.c]}`;
@@ -65,7 +74,9 @@ function validatePuzzle(puzzle, expectedN) {
       return errors;
     }
     if (candidates.length > 1) {
-      errors.push(`lance ${step + 1}: ${candidates.length} lances mantêm o mate (${candidates.map(m => notation(board, m)).join(', ')})`);
+      errors.push(
+        `lance ${step + 1}: ${candidates.length} lances mantêm o mate (${candidates.map(m => notation(board, m)).join(', ')})`
+      );
     }
 
     board = applyMove(board, expected);
@@ -141,7 +152,9 @@ const SYMMETRIES = [
 
 function canonicalKey(board) {
   return SYMMETRIES.map(t => {
-    const out = Array(3).fill(null).map(() => Array(3).fill(null));
+    const out = Array(3)
+      .fill(null)
+      .map(() => Array(3).fill(null));
     for (let r = 0; r < 3; r++) {
       for (let c = 0; c < 3; c++) {
         const [nr, nc] = t(r, c);
@@ -152,8 +165,17 @@ function canonicalKey(board) {
   }).sort()[0];
 }
 
-function* placements(pieces, board = Array(3).fill(null).map(() => Array(3).fill(null)), i = 0) {
-  if (i === pieces.length) { yield board.map(row => [...row]); return; }
+function* placements(
+  pieces,
+  board = Array(3)
+    .fill(null)
+    .map(() => Array(3).fill(null)),
+  i = 0
+) {
+  if (i === pieces.length) {
+    yield board.map(row => [...row]);
+    return;
+  }
   for (let r = 0; r < 3; r++) {
     for (let c = 0; c < 3; c++) {
       if (board[r][c]) continue;
@@ -177,8 +199,9 @@ function buildLine(board, n) {
     if (step === n - 1) break;
 
     // Entre as melhores defesas, escolhe uma em que a continuação branca seja única
-    const defense = bestDefenses(board, remaining)
-      .find(reply => mateMoves(applyMove(board, reply), remaining - 1).length === 1);
+    const defense = bestDefenses(board, remaining).find(
+      reply => mateMoves(applyMove(board, reply), remaining - 1).length === 1
+    );
     if (!defense) return null;
     blackResponses.push(defense);
     board = applyMove(board, defense);
@@ -195,7 +218,19 @@ function seededRandom(seed) {
 }
 
 function generate(maxN = 6, perLevel = 5) {
-  const whiteSets = [['Q'], ['R'], ['Q', 'R'], ['Q', 'B'], ['Q', 'N'], ['R', 'R'], ['R', 'B'], ['R', 'N'], ['B', 'B'], ['B', 'N'], ['N', 'N']];
+  const whiteSets = [
+    ['Q'],
+    ['R'],
+    ['Q', 'R'],
+    ['Q', 'B'],
+    ['Q', 'N'],
+    ['R', 'R'],
+    ['R', 'B'],
+    ['R', 'N'],
+    ['B', 'B'],
+    ['B', 'N'],
+    ['N', 'N']
+  ];
   const blackSets = [[], ['n'], ['b'], ['r']];
   const found = {};
   const seen = new Set();
@@ -222,7 +257,9 @@ function generate(maxN = 6, perLevel = 5) {
   // Sorteia puzzles variados: no máximo um por combinação de material
   const random = seededRandom(42);
   const result = {};
-  for (const n of Object.keys(found).map(Number).sort((a, b) => a - b)) {
+  for (const n of Object.keys(found)
+    .map(Number)
+    .sort((a, b) => a - b)) {
     const byMaterial = {};
     found[n].forEach(p => (byMaterial[p.material] = byMaterial[p.material] || []).push(p));
     const groups = Object.values(byMaterial);

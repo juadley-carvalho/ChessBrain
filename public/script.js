@@ -6,7 +6,9 @@ const { COORDS } = ChessEngine;
 
 class Chess3x3 {
   constructor() {
-    this.board = Array(3).fill(null).map(() => Array(3).fill(null));
+    this.board = Array(3)
+      .fill(null)
+      .map(() => Array(3).fill(null));
     this.selectedSquare = null;
     this.legalMoves = [];
 
@@ -46,7 +48,7 @@ class Chess3x3 {
       for (let c = 0; c < 3; c++) {
         const square = document.createElement('div');
         const isLight = (r + c) % 2 === 0;
-        
+
         square.className = `square ${isLight ? 'light' : 'dark'}`;
         square.dataset.row = r;
         square.dataset.col = c;
@@ -59,15 +61,15 @@ class Chess3x3 {
             this.handleSquareClick(r, c);
           }
         });
-        square.addEventListener('keydown', (e) => this.handleSquareKey(e, r, c));
+        square.addEventListener('keydown', e => this.handleSquareKey(e, r, c));
         square.addEventListener('focus', () => this.setFocusedSquare(r, c));
 
         boardEl.appendChild(square);
       }
     }
 
-    window.addEventListener('pointermove', (e) => this.handlePointerMove(e));
-    window.addEventListener('pointerup', (e) => this.handlePointerUp(e));
+    window.addEventListener('pointermove', e => this.handlePointerMove(e));
+    window.addEventListener('pointerup', e => this.handlePointerUp(e));
   }
 
   // Teclado: setas movem o foco, Enter/Espaço equivalem ao clique, Esc cancela a seleção
@@ -187,8 +189,7 @@ class Chess3x3 {
         }
       }
     }
-    document.getElementById('target-board')
-      .setAttribute('aria-label', `Objetivo alvo: ${placed.join(', ')}`);
+    document.getElementById('target-board').setAttribute('aria-label', `Objetivo alvo: ${placed.join(', ')}`);
   }
 
   startTimer() {
@@ -199,7 +200,9 @@ class Chess3x3 {
     this.timerInterval = setInterval(() => {
       const elapsed = Date.now() - this.startTime;
       const seconds = (elapsed / 1000).toFixed(1);
-      const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+      const mins = Math.floor(seconds / 60)
+        .toString()
+        .padStart(2, '0');
       const secs = (seconds % 60).toFixed(1).padStart(4, '0');
       timerEl.textContent = `${mins}:${secs}`;
     }, 100);
@@ -258,7 +261,7 @@ class Chess3x3 {
           const isWhite = piece === piece.toUpperCase();
 
           if (!this.isCompleted && !this.isLocked && isWhite) {
-            pieceEl.addEventListener('pointerdown', (e) => this.handlePointerDown(e, r, c));
+            pieceEl.addEventListener('pointerdown', e => this.handlePointerDown(e, r, c));
           }
 
           squareEl.appendChild(pieceEl);
@@ -395,8 +398,10 @@ class Chess3x3 {
     const captured = this.board[to.r][to.c];
     const promoted = ChessEngine.isPromotion(piece, to.r);
     this.board = ChessEngine.applyMove(this.board, { from, to });
-    this.announce(`${ChessPieces.name(piece)} de ${COORDS[from.r][from.c]} para ${COORDS[to.r][to.c]}` +
-      (captured ? `, captura ${ChessPieces.name(captured)}` : ''));
+    this.announce(
+      `${ChessPieces.name(piece)} de ${COORDS[from.r][from.c]} para ${COORDS[to.r][to.c]}` +
+        (captured ? `, captura ${ChessPieces.name(captured)}` : '')
+    );
     if (promoted) this.setFeedback('Peão promovido a Dama!');
 
     if (!isBlackMove) {
@@ -457,8 +462,7 @@ class Chess3x3 {
   chooseBlackResponse(stepIndex, remaining) {
     const defenses = ChessEngine.bestDefenses(this.board, remaining);
     const stored = (this.currentChallenge.blackResponses || [])[stepIndex];
-    return defenses.find(m => ChessEngine.sameMove(m, stored)) ||
-      defenses[Math.floor(Math.random() * defenses.length)];
+    return defenses.find(m => ChessEngine.sameMove(m, stored)) || defenses[Math.floor(Math.random() * defenses.length)];
   }
 
   completeChallenge() {
@@ -601,10 +605,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-close-modal').addEventListener('click', closeModal);
 
   // Fecha com clique fora do cartão ou com Esc
-  modal.addEventListener('click', (e) => {
+  modal.addEventListener('click', e => {
     if (e.target === modal) closeModal();
   });
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
   });
 
@@ -620,10 +624,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Login e cadastro: mesma requisição, só muda a rota
-  const authenticate = async (endpoint) => {
+  const authenticate = async endpoint => {
     if (!authForm.reportValidity()) return;
     authError.textContent = '';
-    submitButtons.forEach(btn => { btn.disabled = true; });
+    submitButtons.forEach(btn => {
+      btn.disabled = true;
+    });
 
     try {
       const res = await fetch(`api/${endpoint}`, {
@@ -645,12 +651,14 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       authError.textContent = 'Erro ao conectar ao servidor.';
     } finally {
-      submitButtons.forEach(btn => { btn.disabled = false; });
+      submitButtons.forEach(btn => {
+        btn.disabled = false;
+      });
     }
   };
 
   // Enter no formulário (ou o botão "Entrar") faz login
-  authForm.addEventListener('submit', (e) => {
+  authForm.addEventListener('submit', e => {
     e.preventDefault();
     authenticate('login');
   });

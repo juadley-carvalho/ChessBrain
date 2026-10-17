@@ -97,7 +97,7 @@ const ChessPieces = (() => {
     const isWhite = piece === piece.toUpperCase();
     const type = piece.toLowerCase();
     const feminine = type === 'r' || type === 'q';
-    return `${NAMES[type]} ${isWhite ? (feminine ? 'branca' : 'branco') : (feminine ? 'preta' : 'preto')}`;
+    return `${NAMES[type]} ${isWhite ? (feminine ? 'branca' : 'branco') : feminine ? 'preta' : 'preto'}`;
   }
 
   return { create, name };

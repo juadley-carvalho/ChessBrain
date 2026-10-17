@@ -21,8 +21,8 @@ const ChessEngine = (() => {
   const KNIGHT_STEPS = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]];
 
   const isInside = (r, c) => r >= 0 && r < 3 && c >= 0 && c < 3;
-  const isWhitePiece = (p) => p === p.toUpperCase();
-  const cloneBoard = (board) => board.map(row => [...row]);
+  const isWhitePiece = p => p === p.toUpperCase();
+  const cloneBoard = board => board.map(row => [...row]);
 
   // Lances da peça em (r, c) sem considerar se o próprio rei fica em xeque
   function rawMoves(board, r, c) {
@@ -36,18 +36,20 @@ const ChessEngine = (() => {
       const target = board[nr][nc];
       return !target || isWhitePiece(target) !== white;
     };
-    const addSteps = (steps) => {
+    const addSteps = steps => {
       for (const [dr, dc] of steps) {
         if (canMoveTo(r + dr, c + dc)) moves.push({ r: r + dr, c: c + dc });
       }
     };
-    const addRays = (dirs) => {
+    const addRays = dirs => {
       for (const [dr, dc] of dirs) {
-        let nr = r + dr, nc = c + dc;
+        let nr = r + dr,
+          nc = c + dc;
         while (canMoveTo(nr, nc)) {
           moves.push({ r: nr, c: nc });
           if (board[nr][nc]) break;
-          nr += dr; nc += dc;
+          nr += dr;
+          nc += dc;
         }
       }
     };
@@ -57,18 +59,29 @@ const ChessEngine = (() => {
         const dir = white ? -1 : 1;
         if (isInside(r + dir, c) && !board[r + dir][c]) moves.push({ r: r + dir, c });
         for (const dc of [-1, 1]) {
-          const nr = r + dir, nc = c + dc;
+          const nr = r + dir,
+            nc = c + dc;
           if (isInside(nr, nc) && board[nr][nc] && isWhitePiece(board[nr][nc]) !== white) {
             moves.push({ r: nr, c: nc });
           }
         }
         break;
       }
-      case 'n': addSteps(KNIGHT_STEPS); break;
-      case 'k': addSteps([...ORTHOGONALS, ...DIAGONALS]); break;
-      case 'r': addRays(ORTHOGONALS); break;
-      case 'b': addRays(DIAGONALS); break;
-      case 'q': addRays([...ORTHOGONALS, ...DIAGONALS]); break;
+      case 'n':
+        addSteps(KNIGHT_STEPS);
+        break;
+      case 'k':
+        addSteps([...ORTHOGONALS, ...DIAGONALS]);
+        break;
+      case 'r':
+        addRays(ORTHOGONALS);
+        break;
+      case 'b':
+        addRays(DIAGONALS);
+        break;
+      case 'q':
+        addRays([...ORTHOGONALS, ...DIAGONALS]);
+        break;
     }
     return moves;
   }
@@ -101,8 +114,7 @@ const ChessEngine = (() => {
   }
 
   // Peão que chega à última linha (a3–c3 para as brancas, a1–c1 para as pretas)
-  const isPromotion = (piece, toRow) =>
-    piece === 'P' ? toRow === 0 : piece === 'p' ? toRow === 2 : false;
+  const isPromotion = (piece, toRow) => (piece === 'P' ? toRow === 0 : piece === 'p' ? toRow === 2 : false);
 
   // Devolve um novo tabuleiro com o lance aplicado; o peão é promovido a Dama automaticamente
   function applyMove(board, move) {
@@ -144,7 +156,7 @@ const ChessEngine = (() => {
   // Busca: brancas forçam mate em até n lances?
   // ==========================================
 
-  const boardKey = (board) => board.map(row => row.map(p => p || '.').join('')).join('/');
+  const boardKey = board => board.map(row => row.map(p => p || '.').join('')).join('/');
   const memo = new Map();
 
   // Brancas a jogar
@@ -155,7 +167,10 @@ const ChessEngine = (() => {
 
     let result = false;
     for (const move of legalMoves(board, true)) {
-      if (mateAfterWhiteMove(applyMove(board, move), n)) { result = true; break; }
+      if (mateAfterWhiteMove(applyMove(board, move), n)) {
+        result = true;
+        break;
+      }
     }
     memo.set(k, result);
     return result;
