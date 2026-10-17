@@ -11,6 +11,7 @@ Jogo web de desafios de xadrez em um **tabuleiro 3x3**. O jogador resolve dois t
 - **Desafio de Movimentação (aleatório)** — o jogo sorteia uma posição inicial com peças brancas e escolhe, por busca em largura, uma posição‑alvo que exige de 4 a 6 lances no mínimo. O objetivo é reproduzir a posição‑alvo, exibida em um mini‑tabuleiro e em notação algébrica (ex.: `Ra3, Bc1`), junto com o número mínimo de lances.
 - **Mate em X jogadas** — puzzles pré‑cadastrados em que as brancas devem dar xeque‑mate seguindo a sequência de lances da solução. As respostas das pretas são jogadas automaticamente.
 - **Interação por clique ou arrastar‑e‑soltar** (Pointer Events, funciona com mouse e toque), com destaque de lances legais e de capturas.
+- **Acessibilidade**: tabuleiro jogável pelo teclado, casas descritas para leitores de tela e lances anunciados em voz alta.
 - **Regras de xadrez aplicadas ao 3x3**: movimentos de todas as peças, bloqueio de lances que deixam o próprio rei em xeque e detecção de afogamento.
 - **Cronômetro e pontuação** — cada desafio vale entre 100 e 1000 pontos, conforme o tempo gasto.
 - **Cadastro e login** com senha criptografada (bcrypt).
@@ -68,7 +69,7 @@ O arquivo `data/chessbrain.db` e as tabelas são criados automaticamente se não
 ## Como jogar
 
 1. Escolha o modo no seletor **Modo de Desafio**.
-2. Mova as peças brancas clicando na peça e depois na casa de destino, ou arrastando a peça.
+2. Mova as peças brancas clicando na peça e depois na casa de destino, ou arrastando a peça. Pelo teclado, use Tab para entrar no tabuleiro, as setas para mudar de casa e Enter ou Espaço para selecionar e mover (Esc cancela).
 3. **Movimentação:** deixe o tabuleiro igual ao **Objetivo Alvo**.
    **Mate em X:** encontre a sequência de lances que dá xeque‑mate. Um lance errado reinicia o desafio.
 4. Use **Reiniciar Desafio** para voltar à posição inicial ou **Próximo Desafio** para sortear outro.

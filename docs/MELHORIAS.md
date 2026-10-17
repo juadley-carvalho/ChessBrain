@@ -31,7 +31,7 @@ _Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos e
 | 16 | Modal de login não envia com Enter                                    | UX          | 🟢 | Concluído |
 | 17 | Sem testes automatizados, lint ou formatação                         | Qualidade   | 🟢 | Aberto |
 | 18 | Organização de pastas e pequenas inconsistências                     | Código      | 🟢 | Aberto |
-| 19 | Acessibilidade do tabuleiro                                          | UX          | 🟢 | Aberto |
+| 19 | Acessibilidade do tabuleiro                                          | UX          | 🟢 | Concluído |
 
 ---
 
@@ -223,6 +223,8 @@ Nada impede regressões nas regras de xadrez nem puzzles inválidos (item 5).
 
 ### 19. Acessibilidade do tabuleiro
 O tabuleiro não funciona pelo teclado, as casas não têm `role` nem `aria-label` (ex.: "Torre branca em a3") e as mensagens de feedback não são anunciadas por leitores de tela (`aria-live`). As peças usam caracteres Unicode, cuja aparência varia entre sistemas. Vale considerar SVGs.
+
+> **Resolvido:** as casas são `role="button"` com `aria-label` (ex.: "a3, Torre branca, selecionada" ou "b2, vazia, lance possível") e `aria-pressed`. O tabuleiro funciona pelo teclado com *tabindex* itinerante: Tab entra no tabuleiro, as setas movem o foco, Enter ou Espaço selecionam e movem, e Esc cancela a seleção. Os lances, inclusive as respostas das pretas, são anunciados numa região `aria-live` invisível, e as mensagens de feedback também (`role="status"`). O mini‑tabuleiro descreve o objetivo no `aria-label`. As peças já estavam em SVG desde o commit `a1de398`.
 
 ---
 

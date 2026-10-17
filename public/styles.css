@@ -343,6 +343,12 @@ h2, h3, .board-label, .stat-box .label, .mode-selector-container label {
   background-color: var(--square-dark);
 }
 
+.board-3x3:not(.mini-board) .square:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: -3px;
+  z-index: 3;
+}
+
 .square.selected {
   background-color: var(--square-selected) !important;
   box-shadow: inset 0 0 0 3px rgba(120, 80, 10, 0.45);
@@ -701,4 +707,17 @@ button:focus-visible {
 
 .hidden {
   display: none !important;
+}
+
+/* Visível só para leitores de tela */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

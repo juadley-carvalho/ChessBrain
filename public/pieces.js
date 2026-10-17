@@ -85,10 +85,18 @@ const ChessPieces = (() => {
     const el = document.createElement('div');
     el.className = `piece ${isWhite ? 'white' : 'black'}`;
     el.setAttribute('role', 'img');
-    el.setAttribute('aria-label', `${NAMES[type]} ${isWhite ? 'branco' : 'preto'}`);
+    el.setAttribute('aria-label', name(piece));
     el.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true">${SHAPES[type]}</svg>`;
     return el;
   }
 
-  return { create };
+  // Nome por extenso, ex.: 'R' → "Torre branca", 'n' → "Cavalo preto"
+  function name(piece) {
+    const isWhite = piece === piece.toUpperCase();
+    const type = piece.toLowerCase();
+    const feminine = type === 'r' || type === 'q';
+    return `${NAMES[type]} ${isWhite ? (feminine ? 'branca' : 'branco') : (feminine ? 'preta' : 'preto')}`;
+  }
+
+  return { create, name };
 })();

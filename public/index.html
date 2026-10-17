@@ -68,17 +68,19 @@
       <div class="game-play-area">
         <div class="board-wrapper">
           <div class="board-label">Tabuleiro Atual</div>
-          <div id="board" class="board-3x3"></div>
+          <div id="board" class="board-3x3" role="group" aria-label="Tabuleiro atual (setas para navegar, Enter para selecionar e mover)"></div>
         </div>
 
         <!-- Miniatura do Objetivo -->
         <div id="target-board-wrapper" class="board-wrapper mini-wrapper hidden">
           <div class="board-label">Objetivo Alvo</div>
-          <div id="target-board" class="board-3x3 mini-board"></div>
+          <div id="target-board" class="board-3x3 mini-board" role="img" aria-label="Objetivo alvo"></div>
         </div>
       </div>
 
-      <div id="game-feedback" class="feedback-msg"></div>
+      <div id="game-feedback" class="feedback-msg" role="status" aria-live="polite"></div>
+      <!-- Anuncia os lances para leitores de tela -->
+      <div id="move-announcer" class="sr-only" aria-live="polite"></div>
 
       <div class="game-controls">
         <button id="btn-reset" class="btn-secondary">Reiniciar Desafio</button>

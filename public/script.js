@@ -28,6 +28,8 @@ class Chess3x3 {
     // Bloqueia a entrada enquanto há uma ação agendada (resposta das pretas ou reinício)
     this.isLocked = false;
     this.pendingTimeouts = [];
+    // Casa que recebe o foco do teclado (tabindex itinerante); começa em a1
+    this.focusedSquare = { r: 2, c: 0 };
 
     this.initBoardUI();
     this.initTargetBoardUI();
@@ -49,12 +51,16 @@ class Chess3x3 {
         square.dataset.row = r;
         square.dataset.col = c;
         square.dataset.coord = COORDS[r][c];
+        square.setAttribute('role', 'button');
+        square.tabIndex = r === this.focusedSquare.r && c === this.focusedSquare.c ? 0 : -1;
 
         square.addEventListener('click', () => {
           if (!this.draggingState.isDragging) {
             this.handleSquareClick(r, c);
           }
         });
+        square.addEventListener('keydown', (e) => this.handleSquareKey(e, r, c));
+        square.addEventListener('focus', () => this.setFocusedSquare(r, c));
 
         boardEl.appendChild(square);
       }
@@ -62,6 +68,32 @@ class Chess3x3 {
 
     window.addEventListener('pointermove', (e) => this.handlePointerMove(e));
     window.addEventListener('pointerup', (e) => this.handlePointerUp(e));
+  }
+
+  // Teclado: setas movem o foco, Enter/Espaço equivalem ao clique, Esc cancela a seleção
+  handleSquareKey(e, r, c) {
+    const steps = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
+    if (steps[e.key]) {
+      e.preventDefault();
+      const nr = Math.min(2, Math.max(0, r + steps[e.key][0]));
+      const nc = Math.min(2, Math.max(0, c + steps[e.key][1]));
+      this.getSquareEl(nr, nc).focus();
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      this.handleSquareClick(r, c);
+    } else if (e.key === 'Escape' && this.selectedSquare) {
+      this.clearSelection();
+    }
+  }
+
+  setFocusedSquare(r, c) {
+    this.getSquareEl(this.focusedSquare.r, this.focusedSquare.c).tabIndex = -1;
+    this.focusedSquare = { r, c };
+    this.getSquareEl(r, c).tabIndex = 0;
+  }
+
+  getSquareEl(r, c) {
+    return document.querySelector(`[data-coord="${COORDS[r][c]}"]`);
   }
 
   // Inicializa a grade do mini-tabuleiro objetivo
@@ -141,6 +173,7 @@ class Chess3x3 {
 
   // Renderiza as peças no mini-tabuleiro de objetivo
   renderTargetBoard(targetBoard) {
+    const placed = [];
     for (let r = 0; r < 3; r++) {
       for (let c = 0; c < 3; c++) {
         const squareEl = document.querySelector(`[data-target-row="${r}"][data-target-col="${c}"]`);
@@ -150,9 +183,12 @@ class Chess3x3 {
         const piece = targetBoard[r][c];
         if (piece) {
           squareEl.appendChild(ChessPieces.create(piece));
+          placed.push(`${ChessPieces.name(piece)} em ${COORDS[r][c]}`);
         }
       }
     }
+    document.getElementById('target-board')
+      .setAttribute('aria-label', `Objetivo alvo: ${placed.join(', ')}`);
   }
 
   startTimer() {
@@ -195,6 +231,11 @@ class Chess3x3 {
     this.clearSelection();
   }
 
+  // Texto lido por leitores de tela (região aria-live invisível)
+  announce(msg) {
+    document.getElementById('move-announcer').textContent = msg;
+  }
+
   setFeedback(msg, type = '') {
     const feedbackEl = document.getElementById('game-feedback');
     feedbackEl.textContent = msg;
@@ -235,6 +276,14 @@ class Chess3x3 {
             squareEl.classList.add('highlight');
           }
         }
+
+        // Ex.: "a3, Torre branca, selecionada" ou "b2, vazia, lance possível"
+        const isSelected = squareEl.classList.contains('selected');
+        const label = [coord, piece ? ChessPieces.name(piece) : 'vazia'];
+        if (isSelected) label.push('selecionada');
+        if (isLegal) label.push(piece ? 'captura possível' : 'lance possível');
+        squareEl.setAttribute('aria-label', label.join(', '));
+        squareEl.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
       }
     }
   }
@@ -342,8 +391,12 @@ class Chess3x3 {
   }
 
   executeMove(from, to, isBlackMove = false) {
-    const promoted = ChessEngine.isPromotion(this.board[from.r][from.c], to.r);
+    const piece = this.board[from.r][from.c];
+    const captured = this.board[to.r][to.c];
+    const promoted = ChessEngine.isPromotion(piece, to.r);
     this.board = ChessEngine.applyMove(this.board, { from, to });
+    this.announce(`${ChessPieces.name(piece)} de ${COORDS[from.r][from.c]} para ${COORDS[to.r][to.c]}` +
+      (captured ? `, captura ${ChessPieces.name(captured)}` : ''));
     if (promoted) this.setFeedback('Peão promovido a Dama!');
 
     if (!isBlackMove) {
