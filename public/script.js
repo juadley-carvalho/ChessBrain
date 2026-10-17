@@ -84,6 +84,14 @@ class Chess3x3 {
   initModeSelector() {
     const selectEl = document.getElementById('select-mode');
     if (selectEl) {
+      // Só oferece os níveis de mate que têm puzzles cadastrados
+      ChallengeGenerator.getMateLevels().forEach(n => {
+        const option = document.createElement('option');
+        option.value = `mate-${n}`;
+        option.textContent = `⚔️ Mate em ${n} ${n === 1 ? 'Jogada' : 'Jogadas'}`;
+        selectEl.appendChild(option);
+      });
+
       selectEl.addEventListener('change', () => {
         this.generateNextChallenge();
       });
@@ -94,12 +102,13 @@ class Chess3x3 {
     const selectEl = document.getElementById('select-mode');
     const selectedMode = selectEl ? selectEl.value : 'move';
 
-    if (selectedMode === 'move') {
-      this.currentChallenge = ChallengeGenerator.generateRandomMoveChallenge();
-    } else if (selectedMode.startsWith('mate-')) {
+    let challenge = null;
+    if (selectedMode.startsWith('mate-')) {
       const mateInX = parseInt(selectedMode.split('-')[1]);
-      this.currentChallenge = ChallengeGenerator.getMateChallenge(mateInX);
+      const currentId = this.currentChallenge ? this.currentChallenge.id : null;
+      challenge = ChallengeGenerator.getMateChallenge(mateInX, currentId);
     }
+    this.currentChallenge = challenge || ChallengeGenerator.generateRandomMoveChallenge();
 
     this.loadChallenge(this.currentChallenge);
   }

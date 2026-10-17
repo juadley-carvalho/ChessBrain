@@ -18,7 +18,7 @@ _Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos r
 | 3  | XSS armazenado no ranking (nome de usuário via `innerHTML`)          | Segurança   | 🔴 | Concluído |
 | 4  | `chessbrain.db` e `node_modules` versionados no Git                  | Repositório | 🔴 | Concluído |
 | 5  | Puzzle "Mate em 3" é impossível de resolver                          | Jogo        | 🟠 | Concluído |
-| 6  | Modos "Mate em 4" a "Mate em 10" carregam o puzzle de mate em 1      | Jogo        | 🟠 | Aberto |
+| 6  | Modos "Mate em 4" a "Mate em 10" carregam o puzzle de mate em 1      | Jogo        | 🟠 | Concluído |
 | 7  | Jogador pode mover peças durante as esperas (`setTimeout`)           | Jogo        | 🟠 | Aberto |
 | 8  | Sem limite de tentativas de login e sem regras de senha              | Segurança   | 🟠 | Aberto |
 | 9  | Pontuação de login não é carregada; o placar recomeça em 0           | Jogo        | 🟡 | Aberto |
@@ -104,6 +104,8 @@ Posição: rei preto em a3, rei branco em a1, torre em b1. O primeiro lance da s
 A base só tem puzzles para 1, 2 e 3 lances. Nos outros modos o código cai silenciosamente no puzzle de mate em 1 e mostra o título "Mate em 1 Jogada", o que confunde o jogador. Cada nível também tem só um puzzle, então "Próximo Desafio" repete sempre o mesmo.
 
 **Proposta:** gerar as opções do `<select>` a partir das chaves de `MATE_PUZZLES_DATABASE` (ou esconder os modos vazios) e ampliar a base de puzzles. Num 3x3 é viável gerar e verificar puzzles automaticamente por busca exaustiva.
+
+> **Resolvido:** as opções de mate do seletor são geradas a partir das chaves de `MATE_PUZZLES_DATABASE`, então só aparecem níveis com puzzles (hoje de 1 a 7; a busca exaustiva mostrou que não existe mate em 8 ou mais com o material usado). A base tem até 5 puzzles por nível (item 5) e "Próximo Desafio" sorteia um puzzle diferente do atual. O retorno silencioso para o mate em 1 foi removido.
 
 ### 7. Jogador pode mover peças durante as esperas (`setTimeout`)
 **Onde:** [script.js:396](../script.js#L396), [script.js:417](../script.js#L417), [script.js:424-426](../script.js#L424-L426)

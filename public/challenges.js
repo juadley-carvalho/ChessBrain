@@ -150,14 +150,21 @@ static generateRandomMoveChallenge() {
     return moves;
   }
 
-  static getMateChallenge(mateInX) {
+  // Sorteia um puzzle do nível, evitando repetir o atual quando houver alternativa
+  static getMateChallenge(mateInX, currentId = null) {
     const database = MATE_PUZZLES_DATABASE[mateInX];
-    if (!database || database.length === 0) {
-      return MATE_PUZZLES_DATABASE[1][0];
-    }
+    if (!database || database.length === 0) return null;
 
-    const randomIndex = Math.floor(Math.random() * database.length);
-    return database[randomIndex];
+    const options = database.length > 1 ? database.filter(p => p.id !== currentId) : database;
+    return options[Math.floor(Math.random() * options.length)];
+  }
+
+  // Níveis de mate com pelo menos um puzzle, em ordem crescente
+  static getMateLevels() {
+    return Object.keys(MATE_PUZZLES_DATABASE)
+      .map(Number)
+      .filter(n => MATE_PUZZLES_DATABASE[n].length > 0)
+      .sort((a, b) => a - b);
   }
 }
 
