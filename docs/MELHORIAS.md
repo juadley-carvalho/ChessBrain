@@ -85,6 +85,8 @@ O repositório tem cerca de 1.800 arquivos versionados, a maioria de `node_modul
 
 > **Decisão posterior:** o banco (`data/chessbrain.db`) voltou a ser versionado de propósito, para manter os placares junto com o projeto. Só os arquivos temporários do SQLite (`-journal`, `-wal`, `-shm`) ficam no `.gitignore`.
 
+> **Revertido na versão 0.5.1:** o banco saiu do Git de novo (`*.db` no `.gitignore`). Versionado, cada `git pull` no servidor trocava os placares reais pelos do repositório. O servidor já cria `data/` e as tabelas quando o banco não existe, então um clone novo funciona sem arquivo de banco pronto.
+
 ---
 
 ## 🟠 Alta

@@ -42,7 +42,7 @@ ChessBrain/
 │   └── puzzles.js       # Gerador e validador dos puzzles de mate (busca exaustiva)
 ├── tests/               # Testes automatizados (node:test): motor, puzzles, desafios e API
 ├── data/
-│   └── chessbrain.db    # Banco SQLite (versionado no Git)
+│   └── chessbrain.db    # Banco SQLite (criado na primeira execução, fora do Git)
 ├── package.json
 ├── eslint.config.js     # ESLint (Node + scripts do navegador)
 ├── .prettierrc.json     # Prettier (JS e CSS)
@@ -69,7 +69,28 @@ $env:PORT=3006; npm start
 
 Durante o desenvolvimento, `npm run dev` reinicia o servidor a cada alteração no código. A variável `DB_PATH` aponta o servidor para outro arquivo de banco (os testes usam um temporário).
 
-O arquivo `data/chessbrain.db` e as tabelas são criados automaticamente se não existirem. Se houver um `chessbrain.db` na raiz (versões anteriores), ele é movido para `data/` na primeira execução. Apenas a pasta `public/` é servida pelo Express, então o banco e o código do servidor não ficam acessíveis pela rede.
+O arquivo `data/chessbrain.db` e as tabelas são criados automaticamente se não existirem, então um clone novo começa com o banco vazio. O banco não é versionado: cada instalação mantém os próprios usuários e placares. Se houver um `chessbrain.db` na raiz (versões anteriores), ele é movido para `data/` na primeira execução. Apenas a pasta `public/` é servida pelo Express, então o banco e o código do servidor não ficam acessíveis pela rede.
+
+## Atualizar o servidor
+
+No servidor, dentro da pasta do projeto:
+
+```bash
+git pull
+systemctl restart chessbrain   # reinicia o serviço do ChessBrain
+```
+
+O `git pull` não mexe em `data/chessbrain.db`, porque o banco não é versionado.
+
+**Só na primeira atualização depois que o banco saiu do Git** (versão 0.5.1), o `git pull` apagaria o banco do servidor. Nessa vez, guarde o banco antes e devolva depois:
+
+```bash
+mv data/chessbrain.db /root/chessbrain.db.bak   # guarda o banco do servidor
+git pull
+mv /root/chessbrain.db.bak data/chessbrain.db   # devolve o banco do servidor
+chown chessbrain:chessbrain data/chessbrain.db  # garante que o serviço consegue escrever nele
+systemctl restart chessbrain
+```
 
 ## Testes e qualidade
 

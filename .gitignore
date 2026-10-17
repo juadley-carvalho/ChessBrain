@@ -1,8 +1,9 @@
 # Dependências
 node_modules/
 
-# Banco de dados SQLite: data/chessbrain.db é versionado de propósito.
-# Ficam de fora só os arquivos temporários do SQLite.
+# Banco de dados SQLite: cada instalação tem o seu, criado pelo servidor
+# na primeira execução (pasta data/ e tabelas).
+*.db
 *.db-journal
 *.db-wal
 *.db-shm
