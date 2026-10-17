@@ -22,7 +22,8 @@ class Chess3x3 {
 
     this.currentChallenge = null;
     this.moveHistory = [];
-    this.totalScore = 0;
+    // Pontos desde que a página foi aberta; o total salvo fica em currentUser.score
+    this.sessionScore = 0;
     this.currentUser = null;
     this.timerInterval = null;
     this.startTime = null;
@@ -475,13 +476,19 @@ class Chess3x3 {
 
     const elapsedSeconds = (Date.now() - this.startTime) / 1000;
     const pointsGained = Math.max(100, Math.floor(1000 - elapsedSeconds * 10));
-    this.totalScore += pointsGained;
+    this.sessionScore += pointsGained;
+    this.renderScores();
 
-    document.getElementById('score').textContent = this.totalScore;
-    this.setFeedback(`Desafio Concluído! +${pointsGained} pontos`, 'success');
+    const saveHint = this.currentUser ? '' : ' (entre para salvar no ranking)';
+    this.setFeedback(`Desafio Concluído! +${pointsGained} pontos${saveHint}`, 'success');
 
-    // Salva a pontuação caso o jogador esteja logado
-    this.saveUserScore();
+    // Soma os pontos ao total da conta caso o jogador esteja logado
+    this.saveUserScore(pointsGained);
+  }
+
+  renderScores() {
+    document.getElementById('score').textContent = this.sessionScore;
+    document.getElementById('total-score').textContent = this.currentUser ? this.currentUser.score : '—';
   }
 
   calculateRawMoves(r, c) {
@@ -580,16 +587,21 @@ class Chess3x3 {
     }
   }
 
-  async saveUserScore() {
+  async saveUserScore(points) {
     // A identidade vem do cookie de sessão; o servidor ignora visitantes
     if (!this.currentUser) return;
 
     try {
-      await fetch('api/score', {
+      const res = await fetch('api/score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ score: this.totalScore })
+        body: JSON.stringify({ points })
       });
+      const data = await res.json();
+      if (res.ok && this.currentUser) {
+        this.currentUser.score = data.score;
+        this.renderScores();
+      }
       // Atualiza o ranking em tempo real
       this.fetchLeaderboard();
     } catch (err) {
@@ -646,6 +658,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const updateUIForUser = () => {
     const user = game.currentUser;
+    game.renderScores();
     if (user) {
       userStatusEl.textContent = `Jogador: ${user.username}`;
       btnLoginModal.classList.add('hidden');
@@ -684,6 +697,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Erro ao encerrar sessão:', err);
     }
     game.currentUser = null;
+    game.sessionScore = 0;
     updateUIForUser();
   });
 

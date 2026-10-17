@@ -92,7 +92,7 @@ Peças são representadas por letras: maiúsculas = brancas (`K Q R B N P`), min
 pontos = max(100, floor(1000 - segundos * 10))
 ```
 
-A pontuação da sessão é acumulada e enviada ao servidor a cada desafio concluído. O servidor guarda apenas o **maior** valor já enviado por usuário.
+A pontuação é **acumulada**: os pontos de cada desafio concluído são somados ao total da conta, que é o valor usado no ranking. O painel mostra os pontos da **Sessão** (desde que a página foi aberta) e o **Total** salvo, carregado ao fazer login. Pontos feitos como visitante não são salvos.
 
 ## API REST
 
@@ -104,7 +104,7 @@ Todas as rotas recebem e devolvem JSON. Login e cadastro criam uma sessão guard
 | POST   | `/api/login`       | `{ "username", "password" }`           | Autentica e abre a sessão. Retorna `{ success, user: { id, username, score } }`. |
 | GET    | `/api/me`          | —                                      | Retorna o usuário da sessão: `{ user }` (ou `{ user: null }`).    |
 | POST   | `/api/logout`      | —                                      | Encerra a sessão.                                                 |
-| POST   | `/api/score`       | `{ "score" }`                          | **Exige sessão.** Atualiza a pontuação do usuário logado se `score` (inteiro de 0 a 1.000.000) for maior que a atual. |
+| POST   | `/api/score`       | `{ "points" }`                         | **Exige sessão.** Soma os pontos de um desafio (inteiro de 1 a 1.000) ao total do usuário logado. Retorna `{ success, score }`. |
 | GET    | `/api/leaderboard` | —                                      | Retorna os 10 melhores: `[{ username, score }]`.                  |
 
 Erros retornam `{ "error": "mensagem" }` com status `400`, `401` ou `500`.
@@ -118,7 +118,7 @@ Tabela `users`:
 | `id`         | INTEGER  | PK, autoincremento             |
 | `username`   | TEXT     | Único; no cadastro: 3–20 caracteres `[A-Za-z0-9_.-]` |
 | `password`   | TEXT     | Hash bcrypt (custo 10)         |
-| `score`      | INTEGER  | Padrão 0 (maior pontuação)     |
+| `score`      | INTEGER  | Padrão 0 (pontos acumulados)   |
 | `created_at` | DATETIME | Padrão `CURRENT_TIMESTAMP`     |
 
 Tabela `sessions`: `token` (TEXT, PK, aleatório), `user_id` (FK para `users`) e `expires_at` (timestamp em ms).

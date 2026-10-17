@@ -21,7 +21,7 @@ _Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos e
 | 6  | Modos "Mate em 4" a "Mate em 10" carregam o puzzle de mate em 1      | Jogo        | 🟠 | Concluído |
 | 7  | Jogador pode mover peças durante as esperas (`setTimeout`)           | Jogo        | 🟠 | Concluído |
 | 8  | Sem limite de tentativas de login e sem regras de senha              | Segurança   | 🟠 | Descartado |
-| 9  | Pontuação de login não é carregada; o placar recomeça em 0           | Jogo        | 🟡 | Aberto |
+| 9  | Pontuação de login não é carregada; o placar recomeça em 0           | Jogo        | 🟡 | Concluído |
 | 10 | Mate validado só pela sequência exata, não por xeque‑mate real       | Jogo        | 🟡 | Aberto |
 | 11 | Sem promoção de peão                                                  | Jogo        | 🟡 | Aberto |
 | 12 | Desafio de movimentação pode gerar alvo trivial ou igual ao inicial  | Jogo        | 🟡 | Aberto |
@@ -137,6 +137,8 @@ Qualquer senha é aceita (até um único caractere) e não há limite de tentati
 O login devolve `user.score`, mas `totalScore` continua em 0 e o painel "Pontuação" mostra só a sessão atual. O servidor guarda `MAX(score, novo)`, então o "recorde" é o melhor total de uma única sessão, regra que não aparece para o jogador. O logout também não zera o placar exibido.
 
 **Proposta:** definir a regra de pontuação (acumulada para sempre ou recorde por sessão) e deixá‑la clara na interface, com "Recorde" e "Sessão" separados. Ao fazer login, carregar e mostrar a pontuação salva.
+
+> **Resolvido:** a regra passou a ser **pontuação acumulada**. `/api/score` recebe `{ points }` (os pontos de um desafio, de 1 a 1.000) e soma ao total da conta, devolvendo o novo total. Com isso o cliente não envia mais um total arbitrário, só os pontos de cada desafio. O painel mostra "Sessão" e "Total" separados, o total é carregado no login e na restauração da sessão, e o logout zera o placar exibido. Os valores já salvos no banco (recordes de sessão) viram o total inicial de cada jogador.
 
 ### 10. Mate validado só pela sequência exata, não por xeque‑mate real
 **Onde:** [script.js:406-431](../script.js#L406-L431)

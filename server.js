@@ -24,8 +24,8 @@ const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 dias
 
 // Regras de validação
 const USERNAME_REGEX = /^[A-Za-z0-9_.-]{3,20}$/;
-// Pontuação máxima por desafio é 1000; limite generoso para o total de uma sessão
-const MAX_SCORE = 1000000;
+// Pontos de um único desafio (o jogo dá de 100 a 1000)
+const MAX_POINTS_PER_CHALLENGE = 1000;
 
 // Middlewares para aceitar dados JSON nas requisições
 app.use(express.json({ limit: '10kb' }));
@@ -258,21 +258,26 @@ app.post('/api/logout', (req, res) => {
   });
 });
 
-// Rota 5: Salvar / Atualizar Pontuação do Jogador logado
+// Rota 5: Soma os pontos de um desafio concluído ao total do jogador logado
 app.post('/api/score', requireAuth, (req, res) => {
-  const { score } = req.body;
+  const { points } = req.body;
 
-  if (!Number.isInteger(score) || score < 0 || score > MAX_SCORE) {
+  if (!Number.isInteger(points) || points < 1 || points > MAX_POINTS_PER_CHALLENGE) {
     return res.status(400).json({ error: 'Pontuação inválida.' });
   }
 
-  // Atualiza a pontuação apenas se a nova pontuação for maior que a cadastrada
-  const query = `UPDATE users SET score = MAX(score, ?) WHERE id = ?`;
-  db.run(query, [score, req.user.id], function (err) {
+  // A pontuação é acumulada: cada desafio soma ao total salvo
+  const query = `UPDATE users SET score = score + ? WHERE id = ?`;
+  db.run(query, [points, req.user.id], (err) => {
     if (err) {
       return res.status(500).json({ error: 'Erro ao atualizar pontuação.' });
     }
-    res.json({ success: true });
+    db.get(`SELECT score FROM users WHERE id = ?`, [req.user.id], (selectErr, row) => {
+      if (selectErr || !row) {
+        return res.status(500).json({ error: 'Erro ao ler pontuação.' });
+      }
+      res.json({ success: true, score: row.score });
+    });
   });
 });
 
