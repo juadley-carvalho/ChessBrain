@@ -2,6 +2,8 @@
  * ChessBrain - Motor de Xadrez 3x3 com Mini-Tabuleiro de Objetivo e Notação Algébrica
  */
 
+const { COORDS } = ChessEngine;
+
 const PIECE_SYMBOLS = {
   'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
   'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
@@ -352,9 +354,7 @@ class Chess3x3 {
   }
 
   executeMove(from, to, isBlackMove = false) {
-    const piece = this.board[from.r][from.c];
-    this.board[from.r][from.c] = null;
-    this.board[to.r][to.c] = piece;
+    this.board = ChessEngine.applyMove(this.board, { from, to });
 
     if (!isBlackMove) {
       this.moveHistory.push({ from, to });
@@ -367,66 +367,11 @@ class Chess3x3 {
     }
   }
 
-  isKingInCheck(isWhite) {
-    const kingSymbol = isWhite ? 'K' : 'k';
-    let kingPos = null;
-
-    for (let r = 0; r < 3; r++) {
-      for (let c = 0; c < 3; c++) {
-        if (this.board[r][c] === kingSymbol) {
-          kingPos = { r, c };
-          break;
-        }
-      }
-    }
-
-    if (!kingPos) return false;
-
-    for (let r = 0; r < 3; r++) {
-      for (let c = 0; c < 3; c++) {
-        const piece = this.board[r][c];
-        if (piece && (piece === piece.toUpperCase()) !== isWhite) {
-          const moves = this.calculateRawMoves(r, c);
-          if (moves.some(m => m.r === kingPos.r && m.c === kingPos.c)) {
-            return true;
-          }
-        }
-      }
-    }
-    return false;
-  }
-
-  hasKingOnBoard(isWhite) {
-    const kingSymbol = isWhite ? 'K' : 'k';
-    for (let r = 0; r < 3; r++) {
-      for (let c = 0; c < 3; c++) {
-        if (this.board[r][c] === kingSymbol) return true;
-      }
-    }
-    return false;
-  }
-
-  hasLegalMoves(isWhite) {
-    for (let r = 0; r < 3; r++) {
-      for (let c = 0; c < 3; c++) {
-        const piece = this.board[r][c];
-        if (piece && (piece === piece.toUpperCase()) === isWhite) {
-          const moves = this.calculateLegalMoves(r, c);
-          if (moves.length > 0) return true;
-        }
-      }
-    }
-    return false;
-  }
-
   validateChallenge() {
     const challenge = this.currentChallenge;
 
-    if (this.hasKingOnBoard(false)) {
-      const blackInCheck = this.isKingInCheck(false);
-      const blackHasMoves = this.hasLegalMoves(false);
-
-      if (!blackHasMoves && !blackInCheck) {
+    if (ChessEngine.hasKing(this.board, false)) {
+      if (ChessEngine.isStalemate(this.board, false)) {
         this.setFeedback('Empate por Afogamento! As pretas não têm lances válidos.', 'error');
         this.lockInput();
         this.schedule(() => this.loadChallenge(this.currentChallenge), 1500);
@@ -491,100 +436,8 @@ class Chess3x3 {
     document.getElementById('total-score').textContent = this.currentUser ? this.currentUser.score : '—';
   }
 
-  calculateRawMoves(r, c) {
-    const piece = this.board[r][c];
-    if (!piece) return [];
-
-    const isWhite = piece === piece.toUpperCase();
-    const type = piece.toLowerCase();
-    const moves = [];
-
-    const isInside = (nr, nc) => nr >= 0 && nr < 3 && nc >= 0 && nc < 3;
-    const canMoveTo = (nr, nc) => {
-      if (!isInside(nr, nc)) return false;
-      const targetPiece = this.board[nr][nc];
-      if (!targetPiece) return true;
-      const isTargetWhite = targetPiece === targetPiece.toUpperCase();
-      return isWhite !== isTargetWhite;
-    };
-
-    const orthogonals = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-    const diagonals = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
-    const knightSteps = [
-      [-2, -1], [-2, 1], [-1, -2], [-1, 2],
-      [1, -2], [1, 2], [2, -1], [2, 1]
-    ];
-
-    switch (type) {
-      case 'p':
-        const dir = isWhite ? -1 : 1;
-        if (isInside(r + dir, c) && !this.board[r + dir][c]) moves.push({ r: r + dir, c });
-        for (let dc of [-1, 1]) {
-          const nr = r + dir, nc = c + dc;
-          if (isInside(nr, nc) && this.board[nr][nc]) {
-            const isTargetWhite = this.board[nr][nc] === this.board[nr][nc].toUpperCase();
-            if (isWhite !== isTargetWhite) moves.push({ r: nr, c: nc });
-          }
-        }
-        break;
-      case 'n':
-        for (let [dr, dc] of knightSteps) {
-          if (canMoveTo(r + dr, c + dc)) moves.push({ r: r + dr, c: c + dc });
-        }
-        break;
-      case 'k':
-        for (let [dr, dc] of [...orthogonals, ...diagonals]) {
-          if (canMoveTo(r + dr, c + dc)) moves.push({ r: r + dr, c: c + dc });
-        }
-        break;
-      case 'r':
-        this.addRayMoves(r, c, orthogonals, canMoveTo, moves);
-        break;
-      case 'b':
-        this.addRayMoves(r, c, diagonals, canMoveTo, moves);
-        break;
-      case 'q':
-        this.addRayMoves(r, c, [...orthogonals, ...diagonals], canMoveTo, moves);
-        break;
-    }
-    return moves;
-  }
-
   calculateLegalMoves(r, c) {
-    const rawMoves = this.calculateRawMoves(r, c);
-    const piece = this.board[r][c];
-    if (!piece) return [];
-    const isWhite = piece === piece.toUpperCase();
-
-    return rawMoves.filter(move => {
-      const targetBackup = this.board[move.r][move.c];
-      this.board[move.r][move.c] = piece;
-      this.board[r][c] = null;
-
-      const inCheck = this.isKingInCheck(isWhite);
-
-      this.board[r][c] = piece;
-      this.board[move.r][move.c] = targetBackup;
-
-      return !inCheck;
-    });
-  }
-
-  addRayMoves(r, c, directions, canMoveTo, moves) {
-    for (let [dr, dc] of directions) {
-      let nr = r + dr;
-      let nc = c + dc;
-      while (nr >= 0 && nr < 3 && nc >= 0 && nc < 3) {
-        if (canMoveTo(nr, nc)) {
-          moves.push({ r: nr, c: nc });
-          if (this.board[nr][nc] !== null) break;
-        } else {
-          break;
-        }
-        nr += dr;
-        nc += dc;
-      }
-    }
+    return ChessEngine.legalMovesFrom(this.board, r, c);
   }
 
   async saveUserScore(points) {

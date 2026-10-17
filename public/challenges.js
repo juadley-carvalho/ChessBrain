@@ -2,11 +2,7 @@
  * ChessBrain - Gerador de Desafios Dinâmicos com Notação Algébrica
  */
 
-const COORDS = [
-  ['a3', 'b3', 'c3'],
-  ['a2', 'b2', 'c2'],
-  ['a1', 'b1', 'c1']
-];
+// Regras e coordenadas vêm de ChessEngine (engine.js, carregado antes deste arquivo)
 
 class ChallengeGenerator {
   /**
@@ -73,7 +69,7 @@ static generateRandomMoveChallenge() {
       for (let c = 0; c < 3; c++) {
         const p = currentBoard[r][c];
         if (p) {
-          const raw = this.getRawMoves(currentBoard, r, c);
+          const raw = ChessEngine.rawMoves(currentBoard, r, c);
           raw.forEach(m => validMoves.push({ from: { r, c }, to: m }));
         }
       }
@@ -93,7 +89,7 @@ static generateRandomMoveChallenge() {
     for (let c = 0; c < 3; c++) {
       const piece = currentBoard[r][c];
       if (piece) {
-        const coordName = COORDS[r][c];
+        const coordName = ChessEngine.COORDS[r][c];
         targetNotations.push(`${piece}${coordName}`);
       }
     }
@@ -110,45 +106,6 @@ static generateRandomMoveChallenge() {
     targetBoard: currentBoard
   };
 }
-
-  static getRawMoves(board, r, c) {
-    const piece = board[r][c];
-    if (!piece) return [];
-    const moves = [];
-    const isInside = (nr, nc) => nr >= 0 && nr < 3 && nc >= 0 && nc < 3;
-
-    const orthogonals = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-    const diagonals = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
-    const knightSteps = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]];
-
-    const type = piece.toLowerCase();
-
-    const addRay = (dirs) => {
-      for (let [dr, dc] of dirs) {
-        let nr = r + dr, nc = c + dc;
-        while (isInside(nr, nc)) {
-          if (!board[nr][nc]) {
-            moves.push({ r: nr, c: nc });
-          } else break;
-          nr += dr; nc += dc;
-        }
-      }
-    };
-
-    if (type === 'r') addRay(orthogonals);
-    else if (type === 'b') addRay(diagonals);
-    else if (type === 'q') addRay([...orthogonals, ...diagonals]);
-    else if (type === 'k') {
-      for (let [dr, dc] of [...orthogonals, ...diagonals]) {
-        if (isInside(r + dr, c + dc) && !board[r + dr][c + dc]) moves.push({ r: r + dr, c: c + dc });
-      }
-    } else if (type === 'n') {
-      for (let [dr, dc] of knightSteps) {
-        if (isInside(r + dr, c + dc) && !board[r + dr][c + dc]) moves.push({ r: r + dr, c: c + dc });
-      }
-    }
-    return moves;
-  }
 
   // Sorteia um puzzle do nível, evitando repetir o atual quando houver alternativa
   static getMateChallenge(mateInX, currentId = null) {

@@ -25,7 +25,7 @@ _Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos e
 | 10 | Mate validado só pela sequência exata, não por xeque‑mate real       | Jogo        | 🟡 | Aberto |
 | 11 | Sem promoção de peão                                                  | Jogo        | 🟡 | Aberto |
 | 12 | Desafio de movimentação pode gerar alvo trivial ou igual ao inicial  | Jogo        | 🟡 | Aberto |
-| 13 | Lógica de movimento duplicada entre `script.js` e `challenges.js`    | Código      | 🟡 | Aberto |
+| 13 | Lógica de movimento duplicada entre `script.js` e `challenges.js`    | Código      | 🟡 | Concluído |
 | 14 | `bcrypt.hashSync`/`compareSync` bloqueiam o servidor                 | Back‑end    | 🟡 | Concluído |
 | 15 | Servidor sobe mesmo se o banco falhar ao abrir                       | Back‑end    | 🟡 | Concluído |
 | 16 | Modal de login não envia com Enter                                    | UX          | 🟢 | Aberto |
@@ -167,6 +167,8 @@ Os 5 movimentos aleatórios podem se desfazer (uma peça vai e volta), o que ger
 São duas implementações diferentes das mesmas regras: uma sem capturas e sem peão, a outra completa. A classe `Chess3x3` também mistura regras, UI, timer, pontuação e chamadas à API.
 
 **Proposta:** extrair um módulo de regras puro (`engine.js`) que trabalhe sobre uma matriz recebida como parâmetro e não dependa do DOM. Esse módulo pode ser usado pelo front, pelo gerador, pelo validador de puzzles (item 5) e pelo servidor (item 2), e facilita os testes (item 17).
+
+> **Resolvido:** novo [public/engine.js](../public/engine.js) com as regras como funções puras (`rawMoves`, `legalMovesFrom`, `legalMoves`, `isKingInCheck`, `applyMove`, `isMate`, `isStalemate`). Ele é carregado no navegador antes dos outros scripts e exportado via `module.exports` no Node. `script.js`, `challenges.js` e `scripts/puzzles.js` não têm mais cópias próprias das regras, e `COORDS` vem do motor. O gerador de movimentação passou a usar as mesmas regras do jogador, então o peão também se move ao montar o alvo. A classe `Chess3x3` continua cuidando de UI, timer e API; dividi-la mais fica para o item 18.
 
 ### 14. `bcrypt.hashSync` / `compareSync` bloqueiam o servidor
 **Onde:** [server.js:58](../server.js#L58), [server.js:89](../server.js#L89)

@@ -34,7 +34,8 @@ ChessBrain/
 ├── public/              # Única pasta servida ao navegador
 │   ├── index.html       # Página única do jogo (layout, modal de login, ranking)
 │   ├── styles.css       # Estilos do tabuleiro, layout e modais
-│   ├── script.js        # Motor do jogo (classe Chess3x3): regras, UI, timer, pontuação, autenticação
+│   ├── engine.js        # Regras do xadrez 3x3 (funções puras, sem DOM), usadas no navegador e no Node
+│   ├── script.js        # Jogo (classe Chess3x3): UI, validação dos desafios, timer, pontuação, autenticação
 │   └── challenges.js    # Gerador de desafios de movimentação + base de puzzles de mate
 ├── scripts/
 │   └── puzzles.js       # Gerador e validador dos puzzles de mate (busca exaustiva)
