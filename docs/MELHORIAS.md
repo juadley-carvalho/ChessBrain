@@ -26,7 +26,7 @@ _Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos e
 | 11 | Sem promoção de peão                                                  | Jogo        | 🟡 | Aberto |
 | 12 | Desafio de movimentação pode gerar alvo trivial ou igual ao inicial  | Jogo        | 🟡 | Aberto |
 | 13 | Lógica de movimento duplicada entre `script.js` e `challenges.js`    | Código      | 🟡 | Aberto |
-| 14 | `bcrypt.hashSync`/`compareSync` bloqueiam o servidor                 | Back‑end    | 🟡 | Aberto |
+| 14 | `bcrypt.hashSync`/`compareSync` bloqueiam o servidor                 | Back‑end    | 🟡 | Concluído |
 | 15 | Servidor sobe mesmo se o banco falhar ao abrir                       | Back‑end    | 🟡 | Concluído |
 | 16 | Modal de login não envia com Enter                                    | UX          | 🟢 | Aberto |
 | 17 | Sem testes automatizados, lint ou formatação                         | Qualidade   | 🟢 | Aberto |
@@ -172,6 +172,8 @@ São duas implementações diferentes das mesmas regras: uma sem capturas e sem 
 As versões síncronas travam o event loop do Node a cada login ou cadastro.
 
 **Proposta:** usar `await bcrypt.hash(...)` e `await bcrypt.compare(...)`.
+
+> **Resolvido:** cadastro e login usam `await bcrypt.hash` e `await bcrypt.compare`, com erro 500 se o hash falhar.
 
 ### 15. Servidor sobe mesmo se o banco falhar ao abrir
 **Onde:** [server.js:20-27](../server.js#L20-L27)

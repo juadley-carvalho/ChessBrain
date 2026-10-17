@@ -162,7 +162,7 @@ app.use('/api', loadSession);
 // ==========================================
 
 // Rota 1: Cadastro de Usuário
-app.post('/api/register', (req, res) => {
+app.post('/api/register', async (req, res) => {
   const { username, password } = req.body;
 
   if (typeof username !== 'string' || typeof password !== 'string' || !password) {
@@ -176,8 +176,13 @@ app.post('/api/register', (req, res) => {
     });
   }
 
-  // Criptografa a senha antes de salvar
-  const hashedPassword = bcrypt.hashSync(password, 10);
+  // Criptografa a senha antes de salvar (versão assíncrona não trava o event loop)
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 10);
+  } catch {
+    return res.status(500).json({ error: 'Erro ao cadastrar usuário.' });
+  }
 
   const query = `INSERT INTO users (username, password) VALUES (?, ?)`;
   db.run(query, [cleanUsername, hashedPassword], function (err) {
@@ -210,11 +215,18 @@ app.post('/api/login', (req, res) => {
   }
 
   const query = `SELECT * FROM users WHERE username = ?`;
-  db.get(query, [username.trim()], (err, user) => {
+  db.get(query, [username.trim()], async (err, user) => {
     if (err) {
       return res.status(500).json({ error: 'Erro ao consultar usuário.' });
     }
-    if (!user || !bcrypt.compareSync(password, user.password)) {
+
+    let passwordOk = false;
+    try {
+      passwordOk = !!user && await bcrypt.compare(password, user.password);
+    } catch {
+      return res.status(500).json({ error: 'Erro ao validar senha.' });
+    }
+    if (!passwordOk) {
       return res.status(401).json({ error: 'Usuário ou senha inválidos.' });
     }
 
