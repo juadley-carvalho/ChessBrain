@@ -530,8 +530,35 @@ class Chess3x3 {
   }
 
   renderScores() {
-    document.getElementById('score').textContent = this.sessionScore;
-    document.getElementById('total-score').textContent = this.currentUser ? this.currentUser.score : '—';
+    this.renderScoreValue('score', this.sessionScore);
+    this.renderScoreValue('total-score', this.currentUser ? this.currentUser.score : null);
+  }
+
+  // Até 99.999 mostra o número inteiro; acima disso abrevia ("123 mil", "1,2 mi")
+  // e deixa o valor completo no tooltip
+  renderScoreValue(id, value) {
+    const el = document.getElementById(id);
+    if (value === null) {
+      el.textContent = '—';
+      el.removeAttribute('title');
+      return;
+    }
+    const full = value.toLocaleString('pt-BR');
+    el.textContent = value < 100000
+      ? full
+      : value.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 });
+    el.title = `${full} pontos`;
+    this.fitValue(el);
+  }
+
+  // Reduz a fonte até o valor caber na caixa, em vez de cortá-lo
+  fitValue(el) {
+    el.style.fontSize = '';
+    let size = parseFloat(getComputedStyle(el).fontSize);
+    while (el.scrollWidth > el.clientWidth && size > 10) {
+      size -= 1;
+      el.style.fontSize = `${size}px`;
+    }
   }
 
   calculateLegalMoves(r, c) {
@@ -596,6 +623,9 @@ class Chess3x3 {
 
 document.addEventListener('DOMContentLoaded', () => {
   const game = new Chess3x3();
+
+  // A largura das caixas muda no celular (giro de tela); reajusta os valores
+  window.addEventListener('resize', () => game.renderScores());
 
   // Carrega o Ranking Inicial do Banco de Dados
   game.fetchLeaderboard();

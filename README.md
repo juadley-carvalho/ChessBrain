@@ -135,7 +135,7 @@ Peças são representadas por letras: maiúsculas = brancas (`K Q R B N P`), min
 
 Conta como **erro** cada recomeço do mesmo desafio depois de pelo menos um lance: jogada incorreta no mate, afogamento ou o botão **Reiniciar**. O cronômetro não zera nesses recomeços, só ao passar para outro desafio. Um desafio já concluído não pontua de novo se for reiniciado. As regras ficam em `ChallengeGenerator.SCORING` ([public/challenges.js](public/challenges.js)).
 
-A pontuação é **acumulada**: os pontos de cada desafio concluído são somados ao total da conta, que é o valor usado no ranking. O painel mostra os pontos da **Sessão** (desde que a página foi aberta) e o **Total** salvo, carregado ao fazer login. Pontos feitos como visitante não são salvos.
+A pontuação é **acumulada**: os pontos de cada desafio concluído são somados ao total da conta, que é o valor usado no ranking. O painel mostra os pontos ganhos **Nesta visita** (desafios concluídos desde que a página foi aberta; zera ao recarregar ou sair) e o **Total** salvo, carregado ao fazer login. Valores a partir de 100.000 aparecem abreviados ("123 mil", "1,2 mi"), com o número completo no tooltip. Pontos feitos como visitante não são salvos.
 
 ## API REST
 
