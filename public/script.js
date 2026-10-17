@@ -570,16 +570,24 @@ class Chess3x3 {
       if (!listEl) return;
       listEl.innerHTML = '';
 
+      const addRow = (...texts) => {
+        const li = document.createElement('li');
+        texts.forEach((text, i) => {
+          if (i > 0) li.append(' ');
+          const span = document.createElement('span');
+          span.textContent = text;
+          li.appendChild(span);
+        });
+        listEl.appendChild(li);
+      };
+
       if (data.length === 0) {
-        listEl.innerHTML = '<li><span>Nenhum registro ainda</span></li>';
+        addRow('Nenhum registro ainda');
         return;
       }
 
-      data.forEach(item => {
-        const li = document.createElement('li');
-        li.innerHTML = `<span>${item.username}</span> <span>${item.score} pts</span>`;
-        listEl.appendChild(li);
-      });
+      // textContent evita que nomes de usuário sejam interpretados como HTML
+      data.forEach(item => addRow(item.username, `${item.score} pts`));
     } catch (err) {
       console.error('Erro ao carregar ranking:', err);
     }

@@ -114,7 +114,7 @@ Tabela `users`:
 | Coluna       | Tipo     | Observação                     |
 |--------------|----------|--------------------------------|
 | `id`         | INTEGER  | PK, autoincremento             |
-| `username`   | TEXT     | Único, obrigatório             |
+| `username`   | TEXT     | Único; no cadastro: 3–20 caracteres `[A-Za-z0-9_.-]` |
 | `password`   | TEXT     | Hash bcrypt (custo 10)         |
 | `score`      | INTEGER  | Padrão 0 (maior pontuação)     |
 | `created_at` | DATETIME | Padrão `CURRENT_TIMESTAMP`     |

@@ -19,6 +19,7 @@ const SESSION_COOKIE = 'chessbrain_session';
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 dias
 
 // Regras de validação
+const USERNAME_REGEX = /^[A-Za-z0-9_.-]{3,20}$/;
 // Pontuação máxima por desafio é 1000; limite generoso para o total de uma sessão
 const MAX_SCORE = 1000000;
 
@@ -154,11 +155,16 @@ app.use('/api', loadSession);
 app.post('/api/register', (req, res) => {
   const { username, password } = req.body;
 
-  if (typeof username !== 'string' || typeof password !== 'string' || !password || username.trim() === '') {
+  if (typeof username !== 'string' || typeof password !== 'string' || !password) {
     return res.status(400).json({ error: 'Nome de usuário e senha são obrigatórios.' });
   }
 
   const cleanUsername = username.trim();
+  if (!USERNAME_REGEX.test(cleanUsername)) {
+    return res.status(400).json({
+      error: 'O nome de usuário deve ter de 3 a 20 caracteres: letras, números, "_", "." ou "-".'
+    });
+  }
 
   // Criptografa a senha antes de salvar
   const hashedPassword = bcrypt.hashSync(password, 10);
