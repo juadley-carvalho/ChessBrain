@@ -40,6 +40,7 @@ class Chess3x3 {
     this.initBoardUI();
     this.initTargetBoardUI();
     this.initModeSelector();
+    this.renderScoringRules();
     this.generateNextChallenge();
   }
 
@@ -135,6 +136,34 @@ class Chess3x3 {
         this.generateNextChallenge();
       });
     }
+  }
+
+  // Explica a pontuação no quadro abaixo do ranking, com os valores de ChallengeGenerator.SCORING
+  renderScoringRules() {
+    const listEl = document.getElementById('scoring-rules');
+    if (!listEl) return;
+    const { move, mate } = ChallengeGenerator.SCORING;
+    const levels = ChallengeGenerator.getMateLevels();
+    const first = levels[0];
+    const last = levels[levels.length - 1];
+    const mateBase = n => mate.base + (n - 1) * mate.perLevel;
+
+    const rules = [
+      ['Movimentação', `${move.base} pts, −${move.perMistake} por erro (mín. ${move.min})`],
+      [
+        `Mate em ${first} a ${last}`,
+        `${mateBase(first)} a ${mateBase(last)} pts, −${mate.perSecond} por segundo e −${mate.perMistake} por erro (mín. ${mate.min})`
+      ],
+      ['Erro', 'recomeçar após um lance: jogada errada, afogamento ou Reiniciar']
+    ];
+    listEl.innerHTML = '';
+    rules.forEach(([label, text]) => {
+      const li = document.createElement('li');
+      const strong = document.createElement('strong');
+      strong.textContent = `${label}: `;
+      li.append(strong, text);
+      listEl.appendChild(li);
+    });
   }
 
   generateNextChallenge() {

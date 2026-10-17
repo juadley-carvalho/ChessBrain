@@ -168,6 +168,21 @@ h3,
   margin-top: 8px;
 }
 
+/* Regras de pontuação, abaixo do ranking */
+.scoring-card ul {
+  list-style: none;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.scoring-card li + li {
+  margin-top: 8px;
+}
+
+.scoring-card strong {
+  color: var(--text-color);
+}
+
 .ranking-card li span:last-child {
   float: right;
   color: var(--accent);
@@ -600,8 +615,12 @@ button:focus-visible {
     order: 3;
   }
 
-  .ad-sidebar {
+  .scoring-card {
     order: 4;
+  }
+
+  .ad-sidebar {
+    order: 5;
     margin-top: 0;
   }
 
