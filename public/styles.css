@@ -109,6 +109,10 @@ body {
   margin-right: 10px;
 }
 
+#btn-logout {
+  margin-top: 8px;
+}
+
 .ranking-card li span:last-child {
   float: right;
   color: var(--accent);
@@ -382,6 +386,49 @@ button {
 @media (max-width: 850px) {
   .app-layout {
     flex-direction: column;
+  }
+
+  /* No celular o jogo vem primeiro; perfil e ranking ficam no fim */
+  .sidebar {
+    display: contents;
+  }
+
+  .game-container {
+    order: 1;
+  }
+
+  .profile-card {
+    order: 2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+  }
+
+  .profile-card h3 {
+    display: none;
+  }
+
+  .profile-card p {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .profile-card button,
+  #btn-logout {
+    margin-top: 0;
+    padding: 6px 14px;
+  }
+
+  .ranking-card {
+    order: 3;
+  }
+
+  .ad-sidebar {
+    order: 4;
+    margin-top: 0;
   }
 
   .game-play-area {
