@@ -4,22 +4,36 @@
 
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcryptjs');
 
 const app = express();
-// Configurado para rodar na porta 3006
 const PORT = process.env.PORT || 3000;
+
+const PUBLIC_DIR = path.join(__dirname, 'public');
+const DATA_DIR = path.join(__dirname, 'data');
 
 // Middlewares para aceitar dados JSON nas requisições
 app.use(express.json());
-app.use(express.static(path.join(__dirname)));
+// Apenas a pasta public/ é servida; banco e código do servidor ficam inacessíveis
+app.use(express.static(PUBLIC_DIR));
 
-// Conexão / Criação do Banco de Dados SQLite
-const dbPath = path.join(__dirname, 'chessbrain.db');
+// Conexão / Criação do Banco de Dados SQLite (fora da pasta pública)
+fs.mkdirSync(DATA_DIR, { recursive: true });
+const dbPath = path.join(DATA_DIR, 'chessbrain.db');
+
+// Migração: versões anteriores guardavam o banco na raiz do projeto
+const legacyDbPath = path.join(__dirname, 'chessbrain.db');
+if (!fs.existsSync(dbPath) && fs.existsSync(legacyDbPath)) {
+  fs.renameSync(legacyDbPath, dbPath);
+  console.log('📦 Banco movido de ./chessbrain.db para ./data/chessbrain.db');
+}
+
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('Erro ao abrir o banco de dados:', err.message);
+    process.exit(1);
   } else {
     console.log('📦 Banco de Dados SQLite conectado com sucesso!');
     initDatabase();
@@ -130,10 +144,10 @@ app.get('/api/leaderboard', (req, res) => {
 
 // Servir a aplicação principal na rota raiz
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
 });
 
-// Inicialização do Servidor Escutando na Rede Local na porta 3006
+// Inicialização do Servidor Escutando na Rede Local
 app.listen(PORT, '0.0.0.0', () => {
   console.log('====================================================');
   console.log(`🚀 Servidor ChessBrain rodando na porta ${PORT}`);

@@ -23,19 +23,21 @@ Jogo web de desafios de xadrez em um **tabuleiro 3x3**. O jogador resolve dois t
 |-----------|----------------------------------------------|
 | Front‑end | HTML, CSS e JavaScript puro (sem framework)  |
 | Back‑end  | Node.js + Express 4                          |
-| Banco     | SQLite 3 (arquivo `chessbrain.db`)           |
+| Banco     | SQLite 3 (arquivo `data/chessbrain.db`)      |
 | Senhas    | bcryptjs                                     |
 
 ## Estrutura do projeto
 
 ```
 ChessBrain/
-├── server.js        # Servidor Express, API REST e criação do banco SQLite
-├── index.html       # Página única do jogo (layout, modal de login, ranking)
-├── styles.css       # Estilos do tabuleiro, layout e modais
-├── script.js        # Motor do jogo (classe Chess3x3): regras, UI, timer, pontuação, autenticação
-├── challenges.js    # Gerador de desafios de movimentação + base de puzzles de mate
-├── chessbrain.db    # Banco SQLite (criado automaticamente na primeira execução)
+├── server.js            # Servidor Express, API REST e criação do banco SQLite
+├── public/              # Única pasta servida ao navegador
+│   ├── index.html       # Página única do jogo (layout, modal de login, ranking)
+│   ├── styles.css       # Estilos do tabuleiro, layout e modais
+│   ├── script.js        # Motor do jogo (classe Chess3x3): regras, UI, timer, pontuação, autenticação
+│   └── challenges.js    # Gerador de desafios de movimentação + base de puzzles de mate
+├── data/
+│   └── chessbrain.db    # Banco SQLite (criado automaticamente; fora do Git)
 ├── package.json
 └── docs/
     ├── MELHORIAS.md # Melhorias e problemas identificados
@@ -58,7 +60,7 @@ O servidor sobe em `http://localhost:3000` (ou na porta definida pela variável 
 $env:PORT=3006; npm start
 ```
 
-O arquivo `chessbrain.db` e a tabela `users` são criados automaticamente se não existirem.
+O arquivo `data/chessbrain.db` e as tabelas são criados automaticamente se não existirem. Se houver um `chessbrain.db` na raiz (versões anteriores), ele é movido para `data/` na primeira execução. Apenas a pasta `public/` é servida pelo Express, então o banco e o código do servidor não ficam acessíveis pela rede.
 
 ## Como jogar
 
@@ -117,7 +119,7 @@ Tabela `users`:
 
 ## Adicionando puzzles de mate
 
-Os puzzles ficam em `MATE_PUZZLES_DATABASE`, no arquivo [challenges.js](challenges.js), agrupados pela quantidade de lances:
+Os puzzles ficam em `MATE_PUZZLES_DATABASE`, no arquivo [public/challenges.js](public/challenges.js), agrupados pela quantidade de lances:
 
 ```js
 2: [
