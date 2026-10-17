@@ -5,7 +5,7 @@ Documento vivo com os problemas e oportunidades de melhoria encontrados no proje
 **Legenda de prioridade:** 🔴 Crítica · 🟠 Alta · 🟡 Média · 🟢 Baixa
 **Status:** `Aberto` · `Em andamento` · `Concluído` · `Descartado`
 
-_Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0)_
+_Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos resolvidos em seguida)_
 
 ---
 
@@ -13,10 +13,10 @@ _Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0)_
 
 | #  | Item                                                                 | Área        | Prioridade | Status |
 |----|----------------------------------------------------------------------|-------------|------------|--------|
-| 1  | Servidor expõe todos os arquivos do projeto, inclusive o banco       | Segurança   | 🔴 | Aberto |
-| 2  | `/api/score` aceita pontuação de qualquer usuário, sem autenticação  | Segurança   | 🔴 | Aberto |
-| 3  | XSS armazenado no ranking (nome de usuário via `innerHTML`)          | Segurança   | 🔴 | Aberto |
-| 4  | `chessbrain.db` e `node_modules` versionados no Git                  | Repositório | 🔴 | Aberto |
+| 1  | Servidor expõe todos os arquivos do projeto, inclusive o banco       | Segurança   | 🔴 | Concluído |
+| 2  | `/api/score` aceita pontuação de qualquer usuário, sem autenticação  | Segurança   | 🔴 | Concluído |
+| 3  | XSS armazenado no ranking (nome de usuário via `innerHTML`)          | Segurança   | 🔴 | Concluído |
+| 4  | `chessbrain.db` e `node_modules` versionados no Git                  | Repositório | 🔴 | Concluído |
 | 5  | Puzzle "Mate em 3" é impossível de resolver                          | Jogo        | 🟠 | Aberto |
 | 6  | Modos "Mate em 4" a "Mate em 10" carregam o puzzle de mate em 1      | Jogo        | 🟠 | Aberto |
 | 7  | Jogador pode mover peças durante as esperas (`setTimeout`)           | Jogo        | 🟠 | Aberto |
@@ -44,6 +44,8 @@ A raiz do projeto inteira é servida como estática. Qualquer pessoa na rede con
 
 **Proposta:** mover os arquivos do front‑end para uma pasta `public/` e servir apenas ela (`express.static('public')`). Manter o banco fora de qualquer pasta pública, por exemplo em `data/`.
 
+> **Resolvido:** front‑end em `public/` (única pasta estática) e banco em `data/chessbrain.db`, com migração automática do arquivo antigo da raiz. O servidor também passou a encerrar se o banco não abrir (parte do item 15).
+
 ### 2. `/api/score` aceita pontuação de qualquer usuário, sem autenticação
 **Onde:** [server.js:103-119](../server.js#L103-L119), [script.js:545-563](../script.js#L545-L563)
 
@@ -53,6 +55,8 @@ A rota recebe `username` e `score` do corpo e grava sem verificar quem está cha
 - Emitir uma sessão (cookie `httpOnly` com `express-session`) ou um JWT no login/cadastro e exigir isso em `/api/score`, usando o usuário da sessão em vez do `username` do corpo.
 - Validar `score` no servidor (inteiro, ≥ 0, dentro de limites plausíveis).
 - A médio prazo, o servidor deve calcular os pontos: registrar o início e o fim do desafio e validar a solução no back‑end, em vez de confiar no total enviado pelo cliente.
+
+> **Resolvido:** sessão própria (tabela `sessions` + cookie `HttpOnly`/`SameSite=Strict`, sem dependência nova), rotas `/api/me` e `/api/logout`, e `/api/score` grava só no usuário da sessão, com `score` inteiro entre 0 e 1.000.000. O cálculo dos pontos no servidor continua como evolução futura: um jogador logado ainda pode enviar um total inventado para a própria conta.
 
 ### 3. XSS armazenado no ranking
 **Onde:** [script.js:582](../script.js#L582)
@@ -65,6 +69,8 @@ Um usuário cadastrado com nome `<img src=x onerror=alert(1)>` executa JavaScrip
 
 **Proposta:** montar os elementos com `textContent`. Também limitar no cadastro o tamanho e os caracteres permitidos no `username` (ex.: 3–20 caracteres, `[A-Za-z0-9_.-]`).
 
+> **Resolvido:** ranking montado com `textContent` e cadastro restrito a 3–20 caracteres `[A-Za-z0-9_.-]`.
+
 ### 4. `chessbrain.db` e `node_modules` versionados no Git
 **Onde:** raiz do repositório (não existe `.gitignore`)
 
@@ -74,6 +80,8 @@ O repositório tem cerca de 1.800 arquivos versionados, a maioria de `node_modul
 - Criar `.gitignore` com `node_modules/`, `*.db`, `.env`.
 - `git rm -r --cached node_modules chessbrain.db`.
 - Se o repositório for ou vier a ser público, avaliar a limpeza do histórico (`git filter-repo`) e pedir aos usuários existentes que troquem a senha.
+
+> **Resolvido** no commit `6beef5c` (`.gitignore` + remoção do índice). O banco continua nos commits antigos (`b60c8ab`, `4d8c11c`); como o repositório é privado e os dados não são sensíveis, a limpeza do histórico não foi feita.
 
 ---
 
