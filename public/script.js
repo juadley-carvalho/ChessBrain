@@ -465,6 +465,7 @@ class Chess3x3 {
     if (promoted) this.setFeedback('Peão promovido a Dama!');
 
     if (!isBlackMove) {
+      this.lastMovedPawn = piece === 'P';
       this.moveHistory.push({ from, to });
     }
 
@@ -491,6 +492,11 @@ class Chess3x3 {
       const matchesTarget = JSON.stringify(this.board) === JSON.stringify(challenge.targetBoard);
       if (matchesTarget) {
         this.completeChallenge();
+      } else if (this.lastMovedPawn && !ChallengeGenerator.canReachTarget(this.board, challenge.targetBoard)) {
+        // Só o avanço do peão não tem volta, então só ele pode tornar o alvo impossível
+        this.setFeedback('O peão não anda para trás: o alvo ficou impossível. Tente novamente.', 'error');
+        this.lockInput();
+        this.schedule(() => this.retryChallenge(), 1500);
       }
     } else if (challenge.type === 'mate') {
       // Vale qualquer lance que mantenha o mate forçado nos lances restantes, não só o da solução
@@ -589,6 +595,7 @@ class Chess3x3 {
   }
 
   calculateLegalMoves(r, c) {
+    if (this.currentChallenge.type === 'move') return ChallengeGenerator.moveChallengeMoves(this.board, r, c);
     return ChessEngine.legalMovesFrom(this.board, r, c);
   }
 

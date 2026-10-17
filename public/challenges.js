@@ -33,6 +33,7 @@ class ChallengeGenerator {
    * Gera um desafio aleatório de Movimentação (Royal Study) em tempo de execução.
    * Usa no máximo 1 peça de cada tipo (Peão, Torre, Bispo, Cavalo, Rei, Dama) e escolhe
    * um alvo que exige exatamente entre minMoves e maxMoves lances (distância mínima via BFS).
+   * Não há promoção: o alvo tem sempre as mesmas peças da posição inicial.
    */
   static generateRandomMoveChallenge({ numPieces = 6, minMoves = 4, maxMoves = 6 } = {}) {
     const pieces = this.shuffle(['P', 'R', 'B', 'N', 'K', 'Q']).slice(0, Math.min(numPieces, 6));
@@ -80,7 +81,46 @@ class ChallengeGenerator {
     return result;
   }
 
-  // Coloca as peças em casas aleatórias; o peão começa na linha do meio para ter lances
+  // Lances de uma peça no desafio de movimentação: os do motor, menos a promoção
+  // (um peão que vira Dama não volta, e o alvo deixaria de ter as mesmas peças)
+  static moveChallengeMoves(board, r, c) {
+    return ChessEngine.legalMovesFrom(board, r, c).filter(to => !ChessEngine.isPromotion(board[r][c], to.r));
+  }
+
+  /**
+   * O alvo ainda pode ser alcançado? Sem capturas nem promoção, só o avanço do peão
+   * não tem volta, mas ele pode prender as outras peças numa configuração sem saída,
+   * então a resposta vem de uma busca completa (no máximo ~60 mil posições).
+   */
+  static canReachTarget(board, targetBoard) {
+    const inventory = b => b.flat().filter(Boolean).sort().join('');
+    if (inventory(board) !== inventory(targetBoard)) return false;
+
+    const goal = ChessEngine.boardKey(targetBoard);
+    const seen = new Set([ChessEngine.boardKey(board)]);
+    const queue = [board];
+    for (let i = 0; i < queue.length; i++) {
+      const current = queue[i];
+      if (ChessEngine.boardKey(current) === goal) return true;
+      for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) {
+          if (!current[r][c]) continue;
+          for (const to of this.moveChallengeMoves(current, r, c)) {
+            const after = ChessEngine.applyMove(current, { from: { r, c }, to });
+            const key = ChessEngine.boardKey(after);
+            if (!seen.has(key)) {
+              seen.add(key);
+              queue.push(after);
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  // Coloca as peças em casas aleatórias; o peão começa na primeira linha (a1–c1),
+  // de onde tem um lance sem promover
   static randomPlacement(pieces) {
     const board = Array(3)
       .fill(null)
@@ -90,10 +130,10 @@ class ChallengeGenerator {
       for (let c = 0; c < 3; c++) free.push({ r, c });
     }
 
-    // O peão escolhe primeiro, garantindo uma casa livre na linha do meio
+    // O peão escolhe primeiro, garantindo uma casa livre na primeira linha
     const ordered = [...pieces].sort((a, b) => (b === 'P') - (a === 'P'));
     ordered.forEach(piece => {
-      const options = piece === 'P' ? free.filter(pos => pos.r === 1) : free;
+      const options = piece === 'P' ? free.filter(pos => pos.r === 2) : free;
       const pos = options[Math.floor(Math.random() * options.length)];
       free.splice(free.indexOf(pos), 1);
       board[pos.r][pos.c] = piece;
@@ -109,11 +149,10 @@ class ChallengeGenerator {
     for (let depth = 1; depth <= maxDepth; depth++) {
       const next = [];
       for (const board of levels[depth - 1]) {
-        // Só há peças brancas, então os lances brutos já são os legais
         for (let r = 0; r < 3; r++) {
           for (let c = 0; c < 3; c++) {
             if (!board[r][c]) continue;
-            for (const to of ChessEngine.rawMoves(board, r, c)) {
+            for (const to of this.moveChallengeMoves(board, r, c)) {
               const after = ChessEngine.applyMove(board, { from: { r, c }, to });
               const key = ChessEngine.boardKey(after);
               if (!seen.has(key)) {
