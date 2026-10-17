@@ -19,7 +19,7 @@ _Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos r
 | 4  | `chessbrain.db` e `node_modules` versionados no Git                  | Repositório | 🔴 | Concluído |
 | 5  | Puzzle "Mate em 3" é impossível de resolver                          | Jogo        | 🟠 | Concluído |
 | 6  | Modos "Mate em 4" a "Mate em 10" carregam o puzzle de mate em 1      | Jogo        | 🟠 | Concluído |
-| 7  | Jogador pode mover peças durante as esperas (`setTimeout`)           | Jogo        | 🟠 | Aberto |
+| 7  | Jogador pode mover peças durante as esperas (`setTimeout`)           | Jogo        | 🟠 | Concluído |
 | 8  | Sem limite de tentativas de login e sem regras de senha              | Segurança   | 🟠 | Aberto |
 | 9  | Pontuação de login não é carregada; o placar recomeça em 0           | Jogo        | 🟡 | Aberto |
 | 10 | Mate validado só pela sequência exata, não por xeque‑mate real       | Jogo        | 🟡 | Aberto |
@@ -115,6 +115,8 @@ A base só tem puzzles para 1, 2 e 3 lances. Nos outros modos o código cai sile
 - Se o jogador clicar em "Próximo Desafio" ou "Reiniciar" durante a espera, o `setTimeout` pendente age sobre o desafio novo: recarrega o desafio ou aplica o lance das pretas.
 
 **Proposta:** adicionar um estado de "entrada bloqueada" (`isLocked`) durante as esperas e guardar os IDs dos timeouts para cancelá‑los com `clearTimeout` em `loadChallenge`.
+
+> **Resolvido:** `isLocked` bloqueia cliques e arrastes durante a resposta das pretas e antes de reiniciar após lance errado ou afogamento. As esperas passam por `schedule()`, e `loadChallenge` cancela as pendentes, então "Reiniciar" e "Próximo Desafio" não são mais afetados por um `setTimeout` antigo.
 
 ### 8. Sem limite de tentativas de login e sem regras de senha
 **Onde:** [server.js:50-101](../server.js#L50-L101)

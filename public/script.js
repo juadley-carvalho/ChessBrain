@@ -27,6 +27,9 @@ class Chess3x3 {
     this.timerInterval = null;
     this.startTime = null;
     this.isCompleted = false;
+    // Bloqueia a entrada enquanto há uma ação agendada (resposta das pretas ou reinício)
+    this.isLocked = false;
+    this.pendingTimeouts = [];
 
     this.initBoardUI();
     this.initTargetBoardUI();
@@ -114,6 +117,8 @@ class Chess3x3 {
   }
 
   loadChallenge(challenge) {
+    this.cancelPendingActions();
+    this.isLocked = false;
     this.board = challenge.initialBoard.map(row => [...row]);
     this.moveHistory = [];
     this.isCompleted = false;
@@ -177,6 +182,25 @@ class Chess3x3 {
     }
   }
 
+  // setTimeout que é cancelado se o desafio for recarregado antes de disparar
+  schedule(fn, delay) {
+    const id = setTimeout(() => {
+      this.pendingTimeouts = this.pendingTimeouts.filter(t => t !== id);
+      fn();
+    }, delay);
+    this.pendingTimeouts.push(id);
+  }
+
+  cancelPendingActions() {
+    this.pendingTimeouts.forEach(id => clearTimeout(id));
+    this.pendingTimeouts = [];
+  }
+
+  lockInput() {
+    this.isLocked = true;
+    this.clearSelection();
+  }
+
   setFeedback(msg, type = '') {
     const feedbackEl = document.getElementById('game-feedback');
     feedbackEl.textContent = msg;
@@ -201,7 +225,7 @@ class Chess3x3 {
           pieceEl.className = `piece ${isWhite ? 'white' : 'black'}`;
           pieceEl.textContent = PIECE_SYMBOLS[piece];
 
-          if (!this.isCompleted && isWhite) {
+          if (!this.isCompleted && !this.isLocked && isWhite) {
             pieceEl.addEventListener('pointerdown', (e) => this.handlePointerDown(e, r, c));
           }
 
@@ -225,7 +249,7 @@ class Chess3x3 {
   }
 
   handlePointerDown(e, r, c) {
-    if (this.isCompleted) return;
+    if (this.isCompleted || this.isLocked) return;
 
     this.selectSquare(r, c);
 
@@ -274,7 +298,7 @@ class Chess3x3 {
         const toC = parseInt(squareEl.dataset.col);
         const move = this.legalMoves.find(m => m.r === toR && m.c === toC);
 
-        if (move) {
+        if (move && !this.isLocked) {
           this.executeMove(this.draggingState.fromSquare, { r: toR, c: toC });
           this.clearSelection();
         }
@@ -295,7 +319,7 @@ class Chess3x3 {
   }
 
   handleSquareClick(r, c) {
-    if (this.isCompleted) return;
+    if (this.isCompleted || this.isLocked) return;
 
     if (this.selectedSquare) {
       const move = this.legalMoves.find(m => m.r === r && m.c === c);
@@ -403,7 +427,8 @@ class Chess3x3 {
 
       if (!blackHasMoves && !blackInCheck) {
         this.setFeedback('Empate por Afogamento! As pretas não têm lances válidos.', 'error');
-        setTimeout(() => this.loadChallenge(this.currentChallenge), 1500);
+        this.lockInput();
+        this.schedule(() => this.loadChallenge(this.currentChallenge), 1500);
         return;
       }
     }
@@ -424,14 +449,17 @@ class Chess3x3 {
           expectedMove.to.c !== this.moveHistory[stepIndex].to.c) {
         
         this.setFeedback('Jogada incorreta! Tente novamente.', 'error');
-        setTimeout(() => this.loadChallenge(this.currentChallenge), 1200);
+        this.lockInput();
+        this.schedule(() => this.loadChallenge(this.currentChallenge), 1200);
         return;
       }
 
       if (this.moveHistory.length < challenge.solution.length) {
         const blackMove = challenge.blackResponses[stepIndex];
         if (blackMove) {
-          setTimeout(() => {
+          this.lockInput();
+          this.schedule(() => {
+            this.isLocked = false;
             this.executeMove(blackMove.from, blackMove.to, true);
           }, 600);
         }
