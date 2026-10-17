@@ -49,12 +49,12 @@ const db = new sqlite3.Database(dbPath, (err) => {
     process.exit(1);
   } else {
     console.log('📦 Banco de Dados SQLite conectado com sucesso!');
-    initDatabase();
+    initDatabase(startServer);
   }
 });
 
-// Inicialização das Tabelas no Banco de Dados
-function initDatabase() {
+// Inicialização das Tabelas no Banco de Dados; chama onReady quando tudo estiver criado
+function initDatabase(onReady) {
   db.serialize(() => {
     // Tabela de Usuários
     db.run(`
@@ -76,7 +76,13 @@ function initDatabase() {
       )
     `);
 
-    db.run(`DELETE FROM sessions WHERE expires_at < ?`, [Date.now()]);
+    db.run(`DELETE FROM sessions WHERE expires_at < ?`, [Date.now()], (err) => {
+      if (err) {
+        console.error('Erro ao preparar o banco de dados:', err.message);
+        process.exit(1);
+      }
+      onReady();
+    });
   });
 }
 
@@ -274,11 +280,13 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
 });
 
-// Inicialização do Servidor Escutando na Rede Local
-app.listen(PORT, HOST, () => {
-  console.log('====================================================');
-  console.log(`🚀 Servidor ChessBrain rodando na porta ${PORT}`);
-  console.log(`💻 Acesso Local: http://localhost:${PORT}`);
-  console.log(`📱 Acesso na Rede Local: http://<SEU_IP_LOCAL>:${PORT}`);
-  console.log('====================================================');
-});
+// Inicialização do Servidor Escutando na Rede Local (só depois que o banco estiver pronto)
+function startServer() {
+  app.listen(PORT, HOST, () => {
+    console.log('====================================================');
+    console.log(`🚀 Servidor ChessBrain rodando na porta ${PORT}`);
+    console.log(`💻 Acesso Local: http://localhost:${PORT}`);
+    console.log(`📱 Acesso na Rede Local: http://<SEU_IP_LOCAL>:${PORT}`);
+    console.log('====================================================');
+  });
+}

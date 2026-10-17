@@ -27,7 +27,7 @@ _Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos e
 | 12 | Desafio de movimentação pode gerar alvo trivial ou igual ao inicial  | Jogo        | 🟡 | Aberto |
 | 13 | Lógica de movimento duplicada entre `script.js` e `challenges.js`    | Código      | 🟡 | Aberto |
 | 14 | `bcrypt.hashSync`/`compareSync` bloqueiam o servidor                 | Back‑end    | 🟡 | Aberto |
-| 15 | Servidor sobe mesmo se o banco falhar ao abrir                       | Back‑end    | 🟡 | Aberto |
+| 15 | Servidor sobe mesmo se o banco falhar ao abrir                       | Back‑end    | 🟡 | Concluído |
 | 16 | Modal de login não envia com Enter                                    | UX          | 🟢 | Aberto |
 | 17 | Sem testes automatizados, lint ou formatação                         | Qualidade   | 🟢 | Aberto |
 | 18 | Organização de pastas e pequenas inconsistências                     | Código      | 🟢 | Aberto |
@@ -179,6 +179,8 @@ As versões síncronas travam o event loop do Node a cada login ou cadastro.
 Se o SQLite não abrir, o erro só vai para o log e o servidor continua aceitando requisições, que vão falhar. As rotas também tratam `err` e "usuário não encontrado" do mesmo jeito no login, o que esconde falhas reais de banco.
 
 **Proposta:** encerrar o processo (`process.exit(1)`) se o banco não abrir, ou só chamar `app.listen` depois do `initDatabase`. No login, devolver 500 quando houver `err`.
+
+> **Resolvido:** o processo encerra se o banco não abrir ou se a criação das tabelas falhar, e `app.listen` só é chamado depois que `initDatabase` termina. O login já devolve 500 quando a consulta falha.
 
 ---
 
