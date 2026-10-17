@@ -5,6 +5,9 @@
 // Regras e coordenadas vêm de ChessEngine (engine.js, carregado antes deste arquivo)
 
 class ChallengeGenerator {
+  // Contador dos desafios de movimentação gerados (Date.now() podia repetir o ID)
+  static moveChallengeCount = 0;
+
   /**
    * Gera um desafio aleatório de Movimentação (Royal Study) em tempo de execução.
    * Usa no máximo 1 peça de cada tipo (Peão, Torre, Bispo, Cavalo, Rei, Dama) e escolhe
@@ -34,7 +37,7 @@ class ChallengeGenerator {
       }
 
       return {
-        id: Date.now(),
+        id: `move-${++this.moveChallengeCount}`,
         title: `Desafio de Movimentação (Aleatório)`,
         type: "move",
         description: `Posicione as peças em: ${targetNotations.join(', ')} — mínimo de ${distance} lances`,

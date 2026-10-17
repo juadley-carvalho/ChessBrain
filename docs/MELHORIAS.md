@@ -30,7 +30,7 @@ _Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos e
 | 15 | Servidor sobe mesmo se o banco falhar ao abrir                       | Back‑end    | 🟡 | Concluído |
 | 16 | Modal de login não envia com Enter                                    | UX          | 🟢 | Concluído |
 | 17 | Sem testes automatizados, lint ou formatação                         | Qualidade   | 🟢 | Aberto |
-| 18 | Organização de pastas e pequenas inconsistências                     | Código      | 🟢 | Aberto |
+| 18 | Organização de pastas e pequenas inconsistências                     | Código      | 🟢 | Concluído |
 | 19 | Acessibilidade do tabuleiro                                          | UX          | 🟢 | Concluído |
 
 ---
@@ -220,6 +220,14 @@ Nada impede regressões nas regras de xadrez nem puzzles inválidos (item 5).
 - `COORDS` é uma variável global compartilhada entre os dois scripts por causa da ordem dos `<script>`. Isso se resolve com ES modules.
 - `JSON.parse(localStorage.getItem(...))` quebra se o valor estiver corrompido. Envolver em `try/catch`.
 - `id: Date.now()` como ID de desafio pode colidir. Não é crítico.
+
+> **Resolvido:**
+> - Pastas: o front‑end já estava em `public/` e o banco em `data/` (item 1). O servidor continua como `server.js` na raiz: é um arquivo só, e movê‑lo para `src/` mudaria o comando de execução já usado no deploy sem ganho real.
+> - `package.json` (e o `package-lock.json`) passaram para `0.5.0`, a mesma versão do README.
+> - Os comentários de "porta 3006" e o JSDoc duplicado de `challenges.js` já tinham saído nas refatorações anteriores.
+> - `COORDS` não é mais uma variável solta: vem de `ChessEngine.COORDS` (item 13). Os scripts continuam clássicos em vez de ES modules, porque o mesmo `engine.js` é usado no Node pelo validador e pelos testes sem etapa de build. Os globais que cada script usa ficam declarados na configuração do ESLint (item 17).
+> - O `JSON.parse` do `localStorage` saiu junto com o login antigo (item 2); hoje o código só remove a chave.
+> - O ID dos desafios de movimentação vem de um contador (`move-1`, `move-2`, …) em vez de `Date.now()`.
 
 ### 19. Acessibilidade do tabuleiro
 O tabuleiro não funciona pelo teclado, as casas não têm `role` nem `aria-label` (ex.: "Torre branca em a3") e as mensagens de feedback não são anunciadas por leitores de tela (`aria-live`). As peças usam caracteres Unicode, cuja aparência varia entre sistemas. Vale considerar SVGs.
