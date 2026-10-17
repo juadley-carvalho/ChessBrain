@@ -4,7 +4,9 @@
   "description": "Jogo de desafios de xadrez 3x3",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "check:puzzles": "node scripts/puzzles.js check",
+    "generate:puzzles": "node scripts/puzzles.js generate"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

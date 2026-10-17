@@ -172,11 +172,69 @@ const MATE_PUZZLES_DATABASE = {
       type: "mate",
       description: "As Brancas jogam e dão Xeque-Mate em 1 lance!",
       initialBoard: [
-        ['k', null, null],
+        ['K', null, 'N'],
         [null, null, null],
-        ['K', null, 'R']
+        ['k', null, 'N']
       ],
-      solution: [{ from: { r: 2, c: 2 }, to: { r: 0, c: 2 } }]
+      solution: [
+        { from: { r: 2, c: 2 }, to: { r: 0, c: 1 } }
+      ]
+    },
+    {
+      id: 102,
+      title: "Mate em 1 Jogada",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 1 lance!",
+      initialBoard: [
+        ['Q', 'K', null],
+        [null, null, null],
+        ['N', 'k', null]
+      ],
+      solution: [
+        { from: { r: 0, c: 0 }, to: { r: 1, c: 1 } }
+      ]
+    },
+    {
+      id: 103,
+      title: "Mate em 1 Jogada",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 1 lance!",
+      initialBoard: [
+        ['K', 'r', 'Q'],
+        [null, 'R', null],
+        ['k', null, null]
+      ],
+      solution: [
+        { from: { r: 1, c: 1 }, to: { r: 0, c: 1 } }
+      ]
+    },
+    {
+      id: 104,
+      title: "Mate em 1 Jogada",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 1 lance!",
+      initialBoard: [
+        [null, 'K', null],
+        ['Q', null, 'N'],
+        ['n', null, 'k']
+      ],
+      solution: [
+        { from: { r: 1, c: 0 }, to: { r: 2, c: 0 } }
+      ]
+    },
+    {
+      id: 105,
+      title: "Mate em 1 Jogada",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 1 lance!",
+      initialBoard: [
+        ['K', null, 'n'],
+        [null, null, 'B'],
+        ['k', null, 'N']
+      ],
+      solution: [
+        { from: { r: 2, c: 2 }, to: { r: 0, c: 1 } }
+      ]
     }
   ],
   2: [
@@ -186,16 +244,88 @@ const MATE_PUZZLES_DATABASE = {
       type: "mate",
       description: "As Brancas jogam e dão Xeque-Mate em 2 lances!",
       initialBoard: [
-        ['k', null, null],
-        [null, null, null],
-        ['K', 'P', 'R']
+        ['B', 'K', null],
+        ['n', null, null],
+        ['k', 'B', null]
       ],
       solution: [
-        { from: { r: 2, c: 1 }, to: { r: 1, c: 1 } },
-        { from: { r: 2, c: 2 }, to: { r: 0, c: 2 } }
+        { from: { r: 0, c: 1 }, to: { r: 1, c: 2 } },
+        { from: { r: 0, c: 0 }, to: { r: 1, c: 1 } }
       ],
       blackResponses: [
-        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } }
+        { from: { r: 1, c: 0 }, to: { r: 0, c: 2 } }
+      ]
+    },
+    {
+      id: 202,
+      title: "Mate em 2 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 2 lances!",
+      initialBoard: [
+        ['K', null, 'N'],
+        [null, 'R', null],
+        [null, 'b', 'k']
+      ],
+      solution: [
+        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 0, c: 2 }, to: { r: 1, c: 0 } }
+      ],
+      blackResponses: [
+        { from: { r: 2, c: 1 }, to: { r: 1, c: 0 } }
+      ]
+    },
+    {
+      id: 203,
+      title: "Mate em 2 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 2 lances!",
+      initialBoard: [
+        ['K', 'R', null],
+        ['b', null, 'k'],
+        [null, null, null]
+      ],
+      solution: [
+        { from: { r: 0, c: 0 }, to: { r: 1, c: 0 } },
+        { from: { r: 0, c: 1 }, to: { r: 0, c: 2 } }
+      ],
+      blackResponses: [
+        { from: { r: 1, c: 2 }, to: { r: 2, c: 2 } }
+      ]
+    },
+    {
+      id: 204,
+      title: "Mate em 2 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 2 lances!",
+      initialBoard: [
+        ['Q', 'K', null],
+        ['R', null, null],
+        [null, 'k', 'n']
+      ],
+      solution: [
+        { from: { r: 0, c: 0 }, to: { r: 2, c: 2 } },
+        { from: { r: 1, c: 0 }, to: { r: 2, c: 0 } }
+      ],
+      blackResponses: [
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 2 } }
+      ]
+    },
+    {
+      id: 205,
+      title: "Mate em 2 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 2 lances!",
+      initialBoard: [
+        ['K', null, 'R'],
+        [null, null, null],
+        ['B', 'k', null]
+      ],
+      solution: [
+        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 0, c: 2 }, to: { r: 2, c: 2 } }
+      ],
+      blackResponses: [
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 0 } }
       ]
     }
   ],
@@ -204,20 +334,580 @@ const MATE_PUZZLES_DATABASE = {
       id: 301,
       title: "Mate em 3 Jogadas",
       type: "mate",
-      description: "Monte o cerco e dê Xeque-Mate em 3 lances!",
+      description: "As Brancas jogam e dão Xeque-Mate em 3 lances!",
       initialBoard: [
-        ['k', null, null],
-        [null, null, null],
-        ['K', 'R', null]
+        ['K', null, 'Q'],
+        ['n', 'B', null],
+        [null, 'k', null]
       ],
       solution: [
-        { from: { r: 2, c: 1 }, to: { r: 1, c: 1 } },
-        { from: { r: 1, c: 1 }, to: { r: 1, c: 2 } },
-        { from: { r: 1, c: 2 }, to: { r: 0, c: 2 } }
+        { from: { r: 0, c: 2 }, to: { r: 0, c: 1 } },
+        { from: { r: 1, c: 1 }, to: { r: 2, c: 2 } },
+        { from: { r: 0, c: 1 }, to: { r: 1, c: 1 } }
       ],
       blackResponses: [
+        { from: { r: 1, c: 0 }, to: { r: 2, c: 2 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 2 } }
+      ]
+    },
+    {
+      id: 302,
+      title: "Mate em 3 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 3 lances!",
+      initialBoard: [
+        ['K', 'R', null],
+        [null, null, 'k'],
+        [null, 'b', 'N']
+      ],
+      solution: [
+        { from: { r: 2, c: 2 }, to: { r: 1, c: 0 } },
         { from: { r: 0, c: 0 }, to: { r: 1, c: 0 } },
-        { from: { r: 1, c: 0 }, to: { r: 0, c: 0 } }
+        { from: { r: 0, c: 1 }, to: { r: 0, c: 2 } }
+      ],
+      blackResponses: [
+        { from: { r: 2, c: 1 }, to: { r: 1, c: 0 } },
+        { from: { r: 1, c: 2 }, to: { r: 2, c: 2 } }
+      ]
+    },
+    {
+      id: 303,
+      title: "Mate em 3 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 3 lances!",
+      initialBoard: [
+        ['K', 'R', null],
+        [null, 'n', null],
+        ['k', null, null]
+      ],
+      solution: [
+        { from: { r: 0, c: 1 }, to: { r: 0, c: 2 } },
+        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 0, c: 2 }, to: { r: 2, c: 2 } }
+      ],
+      blackResponses: [
+        { from: { r: 2, c: 0 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 0 } }
+      ]
+    },
+    {
+      id: 304,
+      title: "Mate em 3 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 3 lances!",
+      initialBoard: [
+        ['K', 'N', null],
+        ['n', null, 'k'],
+        [null, null, 'B']
+      ],
+      solution: [
+        { from: { r: 0, c: 0 }, to: { r: 1, c: 0 } },
+        { from: { r: 2, c: 2 }, to: { r: 1, c: 1 } },
+        { from: { r: 0, c: 1 }, to: { r: 2, c: 0 } }
+      ],
+      blackResponses: [
+        { from: { r: 1, c: 2 }, to: { r: 0, c: 2 } },
+        { from: { r: 0, c: 2 }, to: { r: 1, c: 2 } }
+      ]
+    },
+    {
+      id: 305,
+      title: "Mate em 3 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 3 lances!",
+      initialBoard: [
+        ['K', 'R', 'b'],
+        [null, null, null],
+        ['k', null, null]
+      ],
+      solution: [
+        { from: { r: 0, c: 1 }, to: { r: 0, c: 2 } },
+        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 0, c: 2 }, to: { r: 2, c: 2 } }
+      ],
+      blackResponses: [
+        { from: { r: 2, c: 0 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 0 } }
+      ]
+    }
+  ],
+  4: [
+    {
+      id: 401,
+      title: "Mate em 4 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 4 lances!",
+      initialBoard: [
+        ['K', 'b', 'B'],
+        [null, null, null],
+        ['N', null, 'k']
+      ],
+      solution: [
+        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 2, c: 0 }, to: { r: 1, c: 2 } },
+        { from: { r: 0, c: 2 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 2 }, to: { r: 0, c: 0 } }
+      ],
+      blackResponses: [
+        { from: { r: 2, c: 2 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 2 } },
+        { from: { r: 2, c: 2 }, to: { r: 2, c: 1 } }
+      ]
+    },
+    {
+      id: 402,
+      title: "Mate em 4 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 4 lances!",
+      initialBoard: [
+        ['K', 'R', 'b'],
+        ['B', null, 'k'],
+        [null, null, null]
+      ],
+      solution: [
+        { from: { r: 1, c: 0 }, to: { r: 2, c: 1 } },
+        { from: { r: 0, c: 1 }, to: { r: 0, c: 2 } },
+        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 0, c: 2 }, to: { r: 2, c: 2 } }
+      ],
+      blackResponses: [
+        { from: { r: 1, c: 2 }, to: { r: 2, c: 2 } },
+        { from: { r: 2, c: 2 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 0 } }
+      ]
+    },
+    {
+      id: 403,
+      title: "Mate em 4 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 4 lances!",
+      initialBoard: [
+        ['K', 'R', null],
+        [null, null, 'N'],
+        ['n', null, 'k']
+      ],
+      solution: [
+        { from: { r: 0, c: 1 }, to: { r: 0, c: 2 } },
+        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 0, c: 2 }, to: { r: 1, c: 2 } },
+        { from: { r: 1, c: 2 }, to: { r: 2, c: 2 } }
+      ],
+      blackResponses: [
+        { from: { r: 2, c: 0 }, to: { r: 1, c: 2 } },
+        { from: { r: 2, c: 2 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 0 } }
+      ]
+    },
+    {
+      id: 404,
+      title: "Mate em 4 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 4 lances!",
+      initialBoard: [
+        ['K', null, null],
+        [null, null, 'R'],
+        ['N', 'k', 'r']
+      ],
+      solution: [
+        { from: { r: 1, c: 2 }, to: { r: 1, c: 0 } },
+        { from: { r: 2, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 1, c: 0 }, to: { r: 2, c: 0 } }
+      ],
+      blackResponses: [
+        { from: { r: 2, c: 2 }, to: { r: 0, c: 2 } },
+        { from: { r: 0, c: 2 }, to: { r: 0, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 2 } }
+      ]
+    },
+    {
+      id: 405,
+      title: "Mate em 4 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 4 lances!",
+      initialBoard: [
+        ['K', 'Q', null],
+        [null, 'R', null],
+        ['r', null, 'k']
+      ],
+      solution: [
+        { from: { r: 0, c: 1 }, to: { r: 1, c: 0 } },
+        { from: { r: 1, c: 1 }, to: { r: 1, c: 0 } },
+        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 1, c: 0 }, to: { r: 2, c: 0 } }
+      ],
+      blackResponses: [
+        { from: { r: 2, c: 0 }, to: { r: 1, c: 0 } },
+        { from: { r: 2, c: 2 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 2 } }
+      ]
+    }
+  ],
+  5: [
+    {
+      id: 501,
+      title: "Mate em 5 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 5 lances!",
+      initialBoard: [
+        ['K', null, 'B'],
+        [null, null, 'R'],
+        [null, 'k', 'r']
+      ],
+      solution: [
+        { from: { r: 1, c: 2 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 1 }, to: { r: 0, c: 1 } },
+        { from: { r: 0, c: 1 }, to: { r: 0, c: 2 } },
+        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 0, c: 2 }, to: { r: 2, c: 2 } }
+      ],
+      blackResponses: [
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 0 } },
+        { from: { r: 2, c: 2 }, to: { r: 0, c: 2 } },
+        { from: { r: 2, c: 0 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 0 } }
+      ]
+    },
+    {
+      id: 502,
+      title: "Mate em 5 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 5 lances!",
+      initialBoard: [
+        ['B', 'K', null],
+        [null, 'b', null],
+        ['k', null, 'N']
+      ],
+      solution: [
+        { from: { r: 0, c: 0 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 1 }, to: { r: 0, c: 0 } },
+        { from: { r: 2, c: 2 }, to: { r: 1, c: 0 } },
+        { from: { r: 1, c: 0 }, to: { r: 0, c: 2 } },
+        { from: { r: 0, c: 0 }, to: { r: 1, c: 1 } }
+      ],
+      blackResponses: [
+        { from: { r: 2, c: 0 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 0 } },
+        { from: { r: 2, c: 0 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 0 } }
+      ]
+    },
+    {
+      id: 503,
+      title: "Mate em 5 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 5 lances!",
+      initialBoard: [
+        ['K', null, 'B'],
+        [null, null, 'R'],
+        [null, 'k', 'b']
+      ],
+      solution: [
+        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 1, c: 2 }, to: { r: 1, c: 0 } },
+        { from: { r: 1, c: 0 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 1 }, to: { r: 1, c: 0 } },
+        { from: { r: 1, c: 0 }, to: { r: 2, c: 0 } }
+      ],
+      blackResponses: [
+        { from: { r: 2, c: 2 }, to: { r: 0, c: 0 } },
+        { from: { r: 0, c: 0 }, to: { r: 1, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 0 } },
+        { from: { r: 2, c: 0 }, to: { r: 2, c: 1 } }
+      ]
+    },
+    {
+      id: 504,
+      title: "Mate em 5 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 5 lances!",
+      initialBoard: [
+        ['K', 'N', 'B'],
+        [null, null, null],
+        ['n', 'k', null]
+      ],
+      solution: [
+        { from: { r: 0, c: 1 }, to: { r: 2, c: 0 } },
+        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 2, c: 0 }, to: { r: 1, c: 2 } },
+        { from: { r: 0, c: 2 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 2 }, to: { r: 0, c: 0 } }
+      ],
+      blackResponses: [
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 2 } },
+        { from: { r: 2, c: 2 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 2 } },
+        { from: { r: 2, c: 2 }, to: { r: 2, c: 1 } }
+      ]
+    },
+    {
+      id: 505,
+      title: "Mate em 5 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 5 lances!",
+      initialBoard: [
+        ['K', null, 'R'],
+        ['b', null, null],
+        ['k', null, null]
+      ],
+      solution: [
+        { from: { r: 0, c: 2 }, to: { r: 1, c: 2 } },
+        { from: { r: 1, c: 2 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 1 }, to: { r: 1, c: 0 } },
+        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 1, c: 0 }, to: { r: 2, c: 0 } }
+      ],
+      blackResponses: [
+        { from: { r: 1, c: 0 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 1, c: 0 } },
+        { from: { r: 2, c: 0 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 2 } }
+      ]
+    }
+  ],
+  6: [
+    {
+      id: 601,
+      title: "Mate em 6 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 6 lances!",
+      initialBoard: [
+        ['K', null, 'B'],
+        ['N', null, 'k'],
+        [null, null, null]
+      ],
+      solution: [
+        { from: { r: 0, c: 2 }, to: { r: 2, c: 0 } },
+        { from: { r: 2, c: 0 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 1 }, to: { r: 2, c: 2 } },
+        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 2, c: 2 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 0 }, to: { r: 0, c: 2 } }
+      ],
+      blackResponses: [
+        { from: { r: 1, c: 2 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 1, c: 2 } },
+        { from: { r: 1, c: 2 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 0 } },
+        { from: { r: 2, c: 0 }, to: { r: 2, c: 1 } }
+      ]
+    },
+    {
+      id: 602,
+      title: "Mate em 6 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 6 lances!",
+      initialBoard: [
+        ['K', null, 'B'],
+        ['N', null, 'k'],
+        ['n', null, null]
+      ],
+      solution: [
+        { from: { r: 0, c: 2 }, to: { r: 2, c: 0 } },
+        { from: { r: 2, c: 0 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 1 }, to: { r: 2, c: 2 } },
+        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 2, c: 2 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 0 }, to: { r: 0, c: 2 } }
+      ],
+      blackResponses: [
+        { from: { r: 1, c: 2 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 1, c: 2 } },
+        { from: { r: 1, c: 2 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 0 } },
+        { from: { r: 2, c: 0 }, to: { r: 2, c: 1 } }
+      ]
+    },
+    {
+      id: 603,
+      title: "Mate em 6 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 6 lances!",
+      initialBoard: [
+        ['K', null, 'B'],
+        ['b', null, 'k'],
+        [null, null, 'N']
+      ],
+      solution: [
+        { from: { r: 2, c: 2 }, to: { r: 1, c: 0 } },
+        { from: { r: 0, c: 2 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 1 }, to: { r: 2, c: 2 } },
+        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 2, c: 2 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 0 }, to: { r: 0, c: 2 } }
+      ],
+      blackResponses: [
+        { from: { r: 1, c: 2 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 1, c: 2 } },
+        { from: { r: 1, c: 2 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 0 } },
+        { from: { r: 2, c: 0 }, to: { r: 2, c: 1 } }
+      ]
+    },
+    {
+      id: 604,
+      title: "Mate em 6 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 6 lances!",
+      initialBoard: [
+        ['K', null, 'B'],
+        [null, 'r', 'k'],
+        [null, null, 'N']
+      ],
+      solution: [
+        { from: { r: 0, c: 2 }, to: { r: 1, c: 1 } },
+        { from: { r: 2, c: 2 }, to: { r: 1, c: 0 } },
+        { from: { r: 1, c: 1 }, to: { r: 2, c: 2 } },
+        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 2, c: 2 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 0 }, to: { r: 0, c: 2 } }
+      ],
+      blackResponses: [
+        { from: { r: 1, c: 2 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 1, c: 2 } },
+        { from: { r: 1, c: 2 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 0 } },
+        { from: { r: 2, c: 0 }, to: { r: 2, c: 1 } }
+      ]
+    },
+    {
+      id: 605,
+      title: "Mate em 6 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 6 lances!",
+      initialBoard: [
+        ['K', null, 'k'],
+        [null, null, 'b'],
+        [null, null, 'R']
+      ],
+      solution: [
+        { from: { r: 2, c: 2 }, to: { r: 2, c: 0 } },
+        { from: { r: 2, c: 0 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 1 }, to: { r: 0, c: 1 } },
+        { from: { r: 0, c: 0 }, to: { r: 1, c: 0 } },
+        { from: { r: 0, c: 1 }, to: { r: 0, c: 2 } }
+      ],
+      blackResponses: [
+        { from: { r: 1, c: 2 }, to: { r: 0, c: 1 } },
+        { from: { r: 0, c: 1 }, to: { r: 1, c: 2 } },
+        { from: { r: 1, c: 2 }, to: { r: 0, c: 1 } },
+        { from: { r: 0, c: 2 }, to: { r: 1, c: 2 } },
+        { from: { r: 1, c: 2 }, to: { r: 2, c: 2 } }
+      ]
+    }
+  ],
+  7: [
+    {
+      id: 701,
+      title: "Mate em 7 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 7 lances!",
+      initialBoard: [
+        ['K', 'N', 'B'],
+        [null, null, 'k'],
+        ['b', null, null]
+      ],
+      solution: [
+        { from: { r: 0, c: 2 }, to: { r: 2, c: 0 } },
+        { from: { r: 2, c: 0 }, to: { r: 0, c: 2 } },
+        { from: { r: 0, c: 2 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 1 }, to: { r: 2, c: 2 } },
+        { from: { r: 0, c: 0 }, to: { r: 1, c: 0 } },
+        { from: { r: 2, c: 2 }, to: { r: 1, c: 1 } },
+        { from: { r: 0, c: 1 }, to: { r: 2, c: 0 } }
+      ],
+      blackResponses: [
+        { from: { r: 1, c: 2 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 1, c: 2 } },
+        { from: { r: 1, c: 2 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 1, c: 2 } },
+        { from: { r: 1, c: 2 }, to: { r: 0, c: 2 } },
+        { from: { r: 0, c: 2 }, to: { r: 1, c: 2 } }
+      ]
+    },
+    {
+      id: 702,
+      title: "Mate em 7 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 7 lances!",
+      initialBoard: [
+        ['K', 'N', 'k'],
+        [null, null, null],
+        ['n', null, 'B']
+      ],
+      solution: [
+        { from: { r: 2, c: 2 }, to: { r: 1, c: 1 } },
+        { from: { r: 0, c: 1 }, to: { r: 2, c: 0 } },
+        { from: { r: 1, c: 1 }, to: { r: 0, c: 2 } },
+        { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } },
+        { from: { r: 2, c: 0 }, to: { r: 1, c: 2 } },
+        { from: { r: 0, c: 2 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 2 }, to: { r: 0, c: 0 } }
+      ],
+      blackResponses: [
+        { from: { r: 0, c: 2 }, to: { r: 1, c: 2 } },
+        { from: { r: 1, c: 2 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 2 } },
+        { from: { r: 2, c: 2 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 2 } },
+        { from: { r: 2, c: 2 }, to: { r: 2, c: 1 } }
+      ]
+    },
+    {
+      id: 703,
+      title: "Mate em 7 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 7 lances!",
+      initialBoard: [
+        ['B', 'K', null],
+        [null, null, 'N'],
+        [null, 'k', null]
+      ],
+      solution: [
+        { from: { r: 0, c: 1 }, to: { r: 0, c: 2 } },
+        { from: { r: 0, c: 0 }, to: { r: 2, c: 2 } },
+        { from: { r: 2, c: 2 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 1 }, to: { r: 2, c: 0 } },
+        { from: { r: 0, c: 2 }, to: { r: 0, c: 1 } },
+        { from: { r: 2, c: 0 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 2 }, to: { r: 0, c: 0 } }
+      ],
+      blackResponses: [
+        { from: { r: 2, c: 1 }, to: { r: 1, c: 0 } },
+        { from: { r: 1, c: 0 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 1, c: 0 } },
+        { from: { r: 1, c: 0 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 2 } },
+        { from: { r: 2, c: 2 }, to: { r: 2, c: 1 } }
+      ]
+    },
+    {
+      id: 704,
+      title: "Mate em 7 Jogadas",
+      type: "mate",
+      description: "As Brancas jogam e dão Xeque-Mate em 7 lances!",
+      initialBoard: [
+        ['B', 'K', 'r'],
+        [null, null, 'N'],
+        [null, 'k', null]
+      ],
+      solution: [
+        { from: { r: 0, c: 1 }, to: { r: 0, c: 2 } },
+        { from: { r: 0, c: 0 }, to: { r: 2, c: 2 } },
+        { from: { r: 2, c: 2 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 1 }, to: { r: 2, c: 0 } },
+        { from: { r: 0, c: 2 }, to: { r: 0, c: 1 } },
+        { from: { r: 2, c: 0 }, to: { r: 1, c: 1 } },
+        { from: { r: 1, c: 2 }, to: { r: 0, c: 0 } }
+      ],
+      blackResponses: [
+        { from: { r: 2, c: 1 }, to: { r: 1, c: 0 } },
+        { from: { r: 1, c: 0 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 1, c: 0 } },
+        { from: { r: 1, c: 0 }, to: { r: 2, c: 1 } },
+        { from: { r: 2, c: 1 }, to: { r: 2, c: 2 } },
+        { from: { r: 2, c: 2 }, to: { r: 2, c: 1 } }
       ]
     }
   ]

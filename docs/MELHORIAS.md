@@ -17,7 +17,7 @@ _Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos r
 | 2  | `/api/score` aceita pontuação de qualquer usuário, sem autenticação  | Segurança   | 🔴 | Concluído |
 | 3  | XSS armazenado no ranking (nome de usuário via `innerHTML`)          | Segurança   | 🔴 | Concluído |
 | 4  | `chessbrain.db` e `node_modules` versionados no Git                  | Repositório | 🔴 | Concluído |
-| 5  | Puzzle "Mate em 3" é impossível de resolver                          | Jogo        | 🟠 | Aberto |
+| 5  | Puzzle "Mate em 3" é impossível de resolver                          | Jogo        | 🟠 | Concluído |
 | 6  | Modos "Mate em 4" a "Mate em 10" carregam o puzzle de mate em 1      | Jogo        | 🟠 | Aberto |
 | 7  | Jogador pode mover peças durante as esperas (`setTimeout`)           | Jogo        | 🟠 | Aberto |
 | 8  | Sem limite de tentativas de login e sem regras de senha              | Segurança   | 🟠 | Aberto |
@@ -95,6 +95,8 @@ O repositório tem cerca de 1.800 arquivos versionados, a maioria de `node_modul
 Posição: rei preto em a3, rei branco em a1, torre em b1. O primeiro lance da solução (Tb1‑b2) deixa as pretas **afogadas**: a2 e b3 estão atacadas pela torre e b2 é protegida pelo rei branco. O jogo detecta o afogamento ([script.js:390-399](../script.js#L390-L399)) e reinicia o desafio, então o jogador nunca consegue concluí‑lo. A primeira resposta das pretas cadastrada (Ra3‑a2) também é ilegal, porque a casa fica ao lado do rei branco.
 
 **Proposta:** substituir por um puzzle válido e criar um script ou teste que valide cada puzzle da base: lances legais, sem afogamento no meio e xeque‑mate no final.
+
+> **Resolvido:** novo script [scripts/puzzles.js](../scripts/puzzles.js), que reproduz as regras do motor e faz busca exaustiva. `npm run check:puzzles` valida cada puzzle: posição legal, mate exato em N (sem mate mais rápido), lance da solução único em cada passo, respostas das pretas legais e de melhor defesa, sem afogamento e com xeque‑mate no fim. O validador também mostrou que o antigo "Mate em 2" tinha mate em 1 (Tc1‑c3), então toda a base foi substituída por puzzles gerados pelo próprio script (`npm run generate:puzzles`), sem peões enquanto não houver promoção (item 11).
 
 ### 6. Modos "Mate em 4" a "Mate em 10" carregam o puzzle de mate em 1
 **Onde:** [index.html](../index.html) (opções `mate-4` a `mate-10`), [challenges.js:153-161](../challenges.js#L153-L161)

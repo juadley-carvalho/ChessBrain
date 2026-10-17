@@ -36,6 +36,8 @@ ChessBrain/
 │   ├── styles.css       # Estilos do tabuleiro, layout e modais
 │   ├── script.js        # Motor do jogo (classe Chess3x3): regras, UI, timer, pontuação, autenticação
 │   └── challenges.js    # Gerador de desafios de movimentação + base de puzzles de mate
+├── scripts/
+│   └── puzzles.js       # Gerador e validador dos puzzles de mate (busca exaustiva)
 ├── data/
 │   └── chessbrain.db    # Banco SQLite (versionado no Git)
 ├── package.json
@@ -133,18 +135,18 @@ Os puzzles ficam em `MATE_PUZZLES_DATABASE`, no arquivo [public/challenges.js](p
     type: "mate",
     description: "As Brancas jogam e dão Xeque-Mate em 2 lances!",
     initialBoard: [
-      ['k', null, null],
-      [null, null, null],
-      ['K', 'P', 'R']
+      ['B', 'K', null],
+      ['n', null, null],
+      ['k', 'B', null]
     ],
     // Lances das brancas, em ordem
     solution: [
-      { from: { r: 2, c: 1 }, to: { r: 1, c: 1 } },
-      { from: { r: 2, c: 2 }, to: { r: 0, c: 2 } }
+      { from: { r: 0, c: 1 }, to: { r: 1, c: 2 } },
+      { from: { r: 0, c: 0 }, to: { r: 1, c: 1 } }
     ],
     // Resposta das pretas após cada lance das brancas (exceto o último)
     blackResponses: [
-      { from: { r: 0, c: 0 }, to: { r: 0, c: 1 } }
+      { from: { r: 1, c: 0 }, to: { r: 0, c: 2 } }
     ]
   }
 ]
@@ -152,7 +154,20 @@ Os puzzles ficam em `MATE_PUZZLES_DATABASE`, no arquivo [public/challenges.js](p
 
 Regras importantes:
 - `solution` deve ter exatamente X lances e `blackResponses`, X − 1.
-- As respostas das pretas **não** são validadas pelo motor, então confira se cada uma é legal na posição.
+- Como o jogo compara a sequência exata, cada lance da solução precisa ser o **único** que mantém o mate no número de lances restantes.
+- Cada resposta das pretas deve ser legal e a melhor defesa (a que adia o mate ao máximo).
 - Nenhum lance das brancas pode deixar as pretas afogadas antes do mate, porque o jogo detecta o afogamento e reinicia o desafio.
+- Sem peões, enquanto o jogo não tiver promoção.
 
-Hoje existem puzzles apenas para mate em 1, 2 e 3. Os modos 4 a 10 caem no puzzle de mate em 1.
+Para conferir tudo isso, rode o validador, que refaz a busca exaustiva de cada puzzle:
+
+```bash
+npm run check:puzzles
+```
+
+A base atual foi gerada automaticamente pelo mesmo script, que testa todas as posições com rei e até duas peças brancas contra rei e no máximo uma peça preta, e sorteia puzzles de materiais variados (até 5 por nível). Com esse material o mate mais longo possível no 3x3 é em 7 lances.
+
+```bash
+# Gera até 5 puzzles por nível, de mate em 1 até mate em 7, e imprime em JSON
+npm run generate:puzzles -- 7 5
+```
