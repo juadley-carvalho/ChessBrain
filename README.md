@@ -53,7 +53,7 @@ npm install
 npm start
 ```
 
-O servidor sobe em `http://localhost:3000` (ou na porta definida pela variável de ambiente `PORT`) e escuta em `0.0.0.0`, ou seja, também fica acessível por outros dispositivos da rede local em `http://<SEU_IP_LOCAL>:3000`.
+O servidor sobe em `http://localhost:3000` (ou na porta definida pela variável de ambiente `PORT`) e escuta em `0.0.0.0` (ou no endereço da variável `HOST`), ou seja, também fica acessível por outros dispositivos da rede local em `http://<SEU_IP_LOCAL>:3000`.
 
 ```bash
 # Exemplo com outra porta (PowerShell)

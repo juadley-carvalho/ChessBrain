@@ -10,7 +10,11 @@ const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcryptjs');
 
 const app = express();
+// Confia no proxy reverso local (Apache) para que req.secure reflita o HTTPS original
+app.set('trust proxy', 'loopback');
 const PORT = process.env.PORT || 3000;
+// Em produção, atrás do Apache, use HOST=127.0.0.1 para não expor a porta diretamente
+const HOST = process.env.HOST || '0.0.0.0';
 
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const DATA_DIR = path.join(__dirname, 'data');
@@ -271,7 +275,7 @@ app.get('/', (req, res) => {
 });
 
 // Inicialização do Servidor Escutando na Rede Local
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, HOST, () => {
   console.log('====================================================');
   console.log(`🚀 Servidor ChessBrain rodando na porta ${PORT}`);
   console.log(`💻 Acesso Local: http://localhost:${PORT}`);

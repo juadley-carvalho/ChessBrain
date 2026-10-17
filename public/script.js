@@ -548,7 +548,7 @@ class Chess3x3 {
     if (!this.currentUser) return;
 
     try {
-      await fetch('/api/score', {
+      await fetch('api/score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ score: this.totalScore })
@@ -563,7 +563,7 @@ class Chess3x3 {
   // Carrega o Ranking Geral do Servidor
   async fetchLeaderboard() {
     try {
-      const res = await fetch('/api/leaderboard');
+      const res = await fetch('api/leaderboard');
       const data = await res.json();
 
       const listEl = document.getElementById('leaderboard-list');
@@ -623,7 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Restaura o usuário a partir do cookie de sessão
   localStorage.removeItem('chessbrain_user'); // resquício da versão sem sessão
   updateUIForUser();
-  fetch('/api/me')
+  fetch('api/me')
     .then(res => res.json())
     .then(data => {
       game.currentUser = data.user || null;
@@ -642,7 +642,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnLogout.addEventListener('click', async () => {
     try {
-      await fetch('/api/logout', { method: 'POST' });
+      await fetch('api/logout', { method: 'POST' });
     } catch (err) {
       console.error('Erro ao encerrar sessão:', err);
     }
@@ -656,7 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const password = document.getElementById('auth-password').value;
 
     try {
-      const res = await fetch('/api/login', {
+      const res = await fetch('api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -683,7 +683,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const password = document.getElementById('auth-password').value;
 
     try {
-      const res = await fetch('/api/register', {
+      const res = await fetch('api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
