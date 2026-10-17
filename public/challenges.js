@@ -7,105 +7,102 @@
 class ChallengeGenerator {
   /**
    * Gera um desafio aleatório de Movimentação (Royal Study) em tempo de execução.
-   * Cria notação algébrica (ex: Ra3, Bc1) e o modelo do mini-tabuleiro alvo.
+   * Usa no máximo 1 peça de cada tipo (Peão, Torre, Bispo, Cavalo, Rei, Dama) e escolhe
+   * um alvo que exige exatamente entre minMoves e maxMoves lances (distância mínima via BFS).
    */
-  /**
- * Gera um desafio aleatório de Movimentação (Royal Study) em tempo de execução.
- * Garante que não haja peças repetidas (no máximo 1x Peão, Torre, Bispo, Cavalo, Rei, Dama).
- */
-static generateRandomMoveChallenge() {
-  // Conjunto fixo com no máximo 1 peça de cada tipo
-  const availablePieces = ['P', 'R', 'B', 'N', 'K', 'Q'];
-  
-  // Define quantas peças colocar no tabuleiro (exemplo: de 1 a 6 peças)
-  // const numPieces = Math.floor(Math.random() * 6) + 1; 
-  const numPieces = 6;
+  static generateRandomMoveChallenge({ numPieces = 6, minMoves = 4, maxMoves = 6 } = {}) {
+    const pieces = this.shuffle(['P', 'R', 'B', 'N', 'K', 'Q']).slice(0, Math.min(numPieces, 6));
 
-  // Embaralha o conjunto de peças e seleciona as 'numPieces' primeiras (sem repetição)
-  const shuffledPieces = [...availablePieces].sort(() => Math.random() - 0.5);
-  const chosenPieces = shuffledPieces.slice(0, numPieces);
+    for (let attempt = 0; attempt < 20; attempt++) {
+      const initialBoard = this.randomPlacement(pieces);
+      const levels = this.positionsByDistance(initialBoard, maxMoves);
 
-  // Tabuleiro Inicial Vazio (3x3)
-  let board = Array(3).fill(null).map(() => Array(3).fill(null));
-  
-  // Mapeia todas as 9 casas do tabuleiro
-  const emptyCoords = [];
-  for (let r = 0; r < 3; r++) {
-    for (let c = 0; c < 3; c++) {
-      // Opcional: Peão branco não deve iniciar na primeira (r=2) nem na última linha (r=0) para ter movimentos válidos
-      emptyCoords.push({ r, c });
-    }
-  }
+      // Distância sorteada na faixa pedida; sem posições nela, usa a mais distante alcançável
+      const wanted = minMoves + Math.floor(Math.random() * (maxMoves - minMoves + 1));
+      const distance = Math.min(wanted, levels.length - 1);
+      if (distance < minMoves) continue; // posição travada demais: sorteia outra
 
-  // Posiciona as peças sorteadas em casas vazias aleatórias
-  chosenPieces.forEach(piece => {
-    // Filtra casas válidas para peões (evita r=0 / linha a3..c3 e r=2 / linha a1..c1 se necessário)
-    let availableCoords = emptyCoords;
-    if (piece === 'P') {
-      const validForPawn = emptyCoords.filter(pos => pos.r === 1); // Força o peão a começar na linha central (a2, b2, c2)
-      if (validForPawn.length > 0) availableCoords = validForPawn;
-    }
+      const candidates = levels[distance];
+      const targetBoard = candidates[Math.floor(Math.random() * candidates.length)];
 
-    const idx = Math.floor(Math.random() * availableCoords.length);
-    const pos = availableCoords[idx];
-    
-    // Remove a casa ocupada da lista de coordenadas livres
-    const globalIdx = emptyCoords.findIndex(c => c.r === pos.r && c.c === pos.c);
-    emptyCoords.splice(globalIdx, 1);
-
-    board[pos.r][pos.c] = piece;
-  });
-
-  const initialBoard = board.map(row => [...row]);
-
-  // Aplica de 4 a 7 movimentos válidos aleatórios para formar a posição-alvo
-  let currentBoard = board.map(row => [...row]);
-  const numSteps = 5; // 4 a 7 movimentos
-
-  for (let step = 0; step < numSteps; step++) {
-    const validMoves = [];
-
-    for (let r = 0; r < 3; r++) {
-      for (let c = 0; c < 3; c++) {
-        const p = currentBoard[r][c];
-        if (p) {
-          const raw = ChessEngine.rawMoves(currentBoard, r, c);
-          raw.forEach(m => validMoves.push({ from: { r, c }, to: m }));
+      // Notação algébrica das peças no tabuleiro final (ex: Ra3, Bc1)
+      const targetNotations = [];
+      for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) {
+          if (targetBoard[r][c]) targetNotations.push(`${targetBoard[r][c]}${ChessEngine.COORDS[r][c]}`);
         }
       }
+
+      return {
+        id: Date.now(),
+        title: `Desafio de Movimentação (Aleatório)`,
+        type: "move",
+        description: `Posicione as peças em: ${targetNotations.join(', ')} — mínimo de ${distance} lances`,
+        minMoves: distance,
+        initialBoard,
+        targetBoard
+      };
     }
-
-    if (validMoves.length === 0) break;
-
-    const randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
-    const p = currentBoard[randomMove.from.r][randomMove.from.c];
-    currentBoard[randomMove.from.r][randomMove.from.c] = null;
-    currentBoard[randomMove.to.r][randomMove.to.c] = p;
+    throw new Error('Não foi possível gerar um desafio de movimentação.');
   }
 
-  // Gera a notação algébrica das peças no tabuleiro final (ex: Ra3, Bc1)
-  const targetNotations = [];
-  for (let r = 0; r < 3; r++) {
-    for (let c = 0; c < 3; c++) {
-      const piece = currentBoard[r][c];
-      if (piece) {
-        const coordName = ChessEngine.COORDS[r][c];
-        targetNotations.push(`${piece}${coordName}`);
+  // Embaralhamento de Fisher–Yates (sem o viés do sort aleatório)
+  static shuffle(items) {
+    const result = [...items];
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
+  }
+
+  // Coloca as peças em casas aleatórias; o peão começa na linha do meio para ter lances
+  static randomPlacement(pieces) {
+    const board = Array(3).fill(null).map(() => Array(3).fill(null));
+    const free = [];
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 3; c++) free.push({ r, c });
+    }
+
+    // O peão escolhe primeiro, garantindo uma casa livre na linha do meio
+    const ordered = [...pieces].sort((a, b) => (b === 'P') - (a === 'P'));
+    ordered.forEach(piece => {
+      const options = piece === 'P' ? free.filter(pos => pos.r === 1) : free;
+      const pos = options[Math.floor(Math.random() * options.length)];
+      free.splice(free.indexOf(pos), 1);
+      board[pos.r][pos.c] = piece;
+    });
+    return board;
+  }
+
+  // BFS a partir da posição inicial: levels[d] = posições cuja distância mínima é d lances
+  static positionsByDistance(initialBoard, maxDepth) {
+    const seen = new Set([ChessEngine.boardKey(initialBoard)]);
+    const levels = [[initialBoard]];
+
+    for (let depth = 1; depth <= maxDepth; depth++) {
+      const next = [];
+      for (const board of levels[depth - 1]) {
+        // Só há peças brancas, então os lances brutos já são os legais
+        for (let r = 0; r < 3; r++) {
+          for (let c = 0; c < 3; c++) {
+            if (!board[r][c]) continue;
+            for (const to of ChessEngine.rawMoves(board, r, c)) {
+              const after = ChessEngine.applyMove(board, { from: { r, c }, to });
+              const key = ChessEngine.boardKey(after);
+              if (!seen.has(key)) {
+                seen.add(key);
+                next.push(after);
+              }
+            }
+          }
+        }
       }
+      if (next.length === 0) break;
+      levels.push(next);
     }
+    return levels;
   }
-
-  const descText = `Posicione as peças em: ${targetNotations.join(', ')}`;
-
-  return {
-    id: Date.now(),
-    title: `Desafio de Movimentação (Aleatório)`,
-    type: "move",
-    description: descText,
-    initialBoard: initialBoard,
-    targetBoard: currentBoard
-  };
-}
 
   // Sorteia um puzzle do nível, evitando repetir o atual quando houver alternativa
   static getMateChallenge(mateInX, currentId = null) {

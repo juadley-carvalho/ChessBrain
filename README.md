@@ -8,7 +8,7 @@ Jogo web de desafios de xadrez em um **tabuleiro 3x3**. O jogador resolve dois t
 
 ## Funcionalidades
 
-- **Desafio de Movimentação (aleatório)** — o jogo sorteia uma posição inicial com peças brancas e gera uma posição‑alvo aplicando movimentos válidos. O objetivo é reproduzir a posição‑alvo, exibida em um mini‑tabuleiro e em notação algébrica (ex.: `Ra3, Bc1`).
+- **Desafio de Movimentação (aleatório)** — o jogo sorteia uma posição inicial com peças brancas e escolhe, por busca em largura, uma posição‑alvo que exige de 4 a 6 lances no mínimo. O objetivo é reproduzir a posição‑alvo, exibida em um mini‑tabuleiro e em notação algébrica (ex.: `Ra3, Bc1`), junto com o número mínimo de lances.
 - **Mate em X jogadas** — puzzles pré‑cadastrados em que as brancas devem dar xeque‑mate seguindo a sequência de lances da solução. As respostas das pretas são jogadas automaticamente.
 - **Interação por clique ou arrastar‑e‑soltar** (Pointer Events, funciona com mouse e toque), com destaque de lances legais e de capturas.
 - **Regras de xadrez aplicadas ao 3x3**: movimentos de todas as peças, bloqueio de lances que deixam o próprio rei em xeque e detecção de afogamento.

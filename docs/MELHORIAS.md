@@ -24,7 +24,7 @@ _Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos e
 | 9  | Pontuação de login não é carregada; o placar recomeça em 0           | Jogo        | 🟡 | Concluído |
 | 10 | Mate validado só pela sequência exata, não por xeque‑mate real       | Jogo        | 🟡 | Concluído |
 | 11 | Sem promoção de peão                                                  | Jogo        | 🟡 | Concluído |
-| 12 | Desafio de movimentação pode gerar alvo trivial ou igual ao inicial  | Jogo        | 🟡 | Aberto |
+| 12 | Desafio de movimentação pode gerar alvo trivial ou igual ao inicial  | Jogo        | 🟡 | Concluído |
 | 13 | Lógica de movimento duplicada entre `script.js` e `challenges.js`    | Código      | 🟡 | Concluído |
 | 14 | `bcrypt.hashSync`/`compareSync` bloqueiam o servidor                 | Back‑end    | 🟡 | Concluído |
 | 15 | Servidor sobe mesmo se o banco falhar ao abrir                       | Back‑end    | 🟡 | Concluído |
@@ -164,6 +164,8 @@ Um peão que chega à última linha continua peão e fica sem lances. Num tabule
 Os 5 movimentos aleatórios podem se desfazer (uma peça vai e volta), o que gera um alvo idêntico ou muito próximo da posição inicial. Os comentários falam em "4 a 7 movimentos", mas o valor está fixo em 5, e `numPieces` está fixo em 6. Além disso, o embaralhamento com `sort(() => Math.random() - 0.5)` é enviesado.
 
 **Proposta:** descartar e gerar de novo quando o alvo for igual ao inicial, ou quando a distância mínima (via BFS) estiver abaixo do mínimo da dificuldade. Usar Fisher‑Yates. Expor a dificuldade (número de peças e de lances) como parâmetro e mostrar ao jogador o número mínimo de lances.
+
+> **Resolvido:** em vez de um passeio aleatório, o gerador faz uma BFS a partir da posição inicial e sorteia o alvo entre as posições cuja distância mínima está na faixa pedida. Se a posição sorteada não tiver alvos longe o bastante, ele sorteia outra. A dificuldade é um parâmetro (`{ numPieces = 6, minMoves = 4, maxMoves = 6 }`), o embaralhamento usa Fisher‑Yates e a descrição mostra o "mínimo de N lances". Cada geração leva poucos milissegundos.
 
 ### 13. Lógica de movimento duplicada entre `script.js` e `challenges.js`
 **Onde:** `Chess3x3.calculateRawMoves` ([script.js:449](../script.js#L449)) e `ChallengeGenerator.getRawMoves` ([challenges.js:114](../challenges.js#L114))
