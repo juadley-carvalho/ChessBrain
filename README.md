@@ -85,10 +85,11 @@ O `git pull` não mexe em `data/chessbrain.db`, porque o banco não é versionad
 **Só na primeira atualização depois que o banco saiu do Git** (versão 0.5.1), o `git pull` apagaria o banco do servidor. Nessa vez, guarde o banco antes e devolva depois:
 
 ```bash
-mv data/chessbrain.db /root/chessbrain.db.bak   # guarda o banco do servidor
-git pull
+mv data/chessbrain.db /root/chessbrain.db.bak   # guarda o banco do servidor (/root sobrevive a reboot, ao contrário de /tmp)
+git pull                                        # remove a pasta data/, que ficou vazia
+mkdir -p data
 mv /root/chessbrain.db.bak data/chessbrain.db   # devolve o banco do servidor
-chown chessbrain:chessbrain data/chessbrain.db  # garante que o serviço consegue escrever nele
+chown -R chessbrain:chessbrain data             # o serviço precisa escrever no banco e na pasta
 systemctl restart chessbrain
 ```
 
