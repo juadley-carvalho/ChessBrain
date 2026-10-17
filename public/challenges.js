@@ -4,6 +4,7 @@
 
 // Regras e coordenadas vêm de ChessEngine (engine.js, carregado antes deste arquivo)
 
+/* exported ChallengeGenerator */
 class ChallengeGenerator {
   // Contador dos desafios de movimentação gerados (Date.now() podia repetir o ID)
   static moveChallengeCount = 0;

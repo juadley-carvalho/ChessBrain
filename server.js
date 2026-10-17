@@ -33,12 +33,14 @@ app.use(express.json({ limit: '10kb' }));
 app.use(express.static(PUBLIC_DIR));
 
 // Conexão / Criação do Banco de Dados SQLite (fora da pasta pública)
-fs.mkdirSync(DATA_DIR, { recursive: true });
-const dbPath = path.join(DATA_DIR, 'chessbrain.db');
+// DB_PATH permite usar outro arquivo (os testes usam um banco temporário)
+const defaultDbPath = path.join(DATA_DIR, 'chessbrain.db');
+const dbPath = process.env.DB_PATH || defaultDbPath;
+fs.mkdirSync(path.dirname(dbPath), { recursive: true });
 
 // Migração: versões anteriores guardavam o banco na raiz do projeto
 const legacyDbPath = path.join(__dirname, 'chessbrain.db');
-if (!fs.existsSync(dbPath) && fs.existsSync(legacyDbPath)) {
+if (dbPath === defaultDbPath && !fs.existsSync(dbPath) && fs.existsSync(legacyDbPath)) {
   fs.renameSync(legacyDbPath, dbPath);
   console.log('📦 Banco movido de ./chessbrain.db para ./data/chessbrain.db');
 }

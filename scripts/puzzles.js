@@ -91,13 +91,19 @@ function validatePuzzle(puzzle, expectedN) {
   return errors;
 }
 
-function loadDatabase() {
+// Executa public/challenges.js (script de navegador) e devolve o gerador e a base de puzzles
+function loadChallenges() {
   const file = path.join(__dirname, '..', 'public', 'challenges.js');
-  const context = {};
+  const context = { ChessEngine: require('../public/engine.js') };
   vm.createContext(context);
-  vm.runInContext(`${fs.readFileSync(file, 'utf8')}\n;this.db = MATE_PUZZLES_DATABASE;`, context);
-  return context.db;
+  vm.runInContext(
+    `${fs.readFileSync(file, 'utf8')}\n;this.exported = { ChallengeGenerator, MATE_PUZZLES_DATABASE };`,
+    context
+  );
+  return context.exported;
 }
+
+const loadDatabase = () => loadChallenges().MATE_PUZZLES_DATABASE;
 
 function check() {
   const database = loadDatabase();
@@ -127,6 +133,7 @@ function check() {
 // ==========================================
 
 // As 8 simetrias do quadrado; sem peões, todas preservam as regras (por isso o gerador não usa peões)
+// prettier-ignore
 const SYMMETRIES = [
   (r, c) => [r, c], (r, c) => [r, 2 - c], (r, c) => [2 - r, c], (r, c) => [2 - r, 2 - c],
   (r, c) => [c, r], (r, c) => [c, 2 - r], (r, c) => [2 - c, r], (r, c) => [2 - c, 2 - r]
@@ -242,4 +249,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { validatePuzzle, generate, legalMoves, isKingInCheck, isMate };
+module.exports = { validatePuzzle, generate, loadChallenges, loadDatabase };

@@ -40,9 +40,12 @@ ChessBrain/
 │   └── challenges.js    # Gerador de desafios de movimentação + base de puzzles de mate
 ├── scripts/
 │   └── puzzles.js       # Gerador e validador dos puzzles de mate (busca exaustiva)
+├── tests/               # Testes automatizados (node:test): motor, puzzles, desafios e API
 ├── data/
 │   └── chessbrain.db    # Banco SQLite (versionado no Git)
 ├── package.json
+├── eslint.config.js     # ESLint (Node + scripts do navegador)
+├── .prettierrc.json     # Prettier (JS e CSS)
 └── docs/
     ├── MELHORIAS.md # Melhorias e problemas identificados
     └── images/      # Capturas de tela usadas na documentação
@@ -64,7 +67,20 @@ O servidor sobe em `http://localhost:3000` (ou na porta definida pela variável 
 $env:PORT=3006; npm start
 ```
 
+Durante o desenvolvimento, `npm run dev` reinicia o servidor a cada alteração no código. A variável `DB_PATH` aponta o servidor para outro arquivo de banco (os testes usam um temporário).
+
 O arquivo `data/chessbrain.db` e as tabelas são criados automaticamente se não existirem. Se houver um `chessbrain.db` na raiz (versões anteriores), ele é movido para `data/` na primeira execução. Apenas a pasta `public/` é servida pelo Express, então o banco e o código do servidor não ficam acessíveis pela rede.
+
+## Testes e qualidade
+
+```bash
+npm test               # testes do motor, dos puzzles, dos desafios e da API (node:test)
+npm run lint           # ESLint
+npm run format:check   # confere a formatação (Prettier); npm run format corrige
+npm run check:puzzles  # valida a base de puzzles de mate com relatório detalhado
+```
+
+Os testes da API sobem o servidor numa porta aleatória com um banco temporário, então não alteram `data/chessbrain.db`.
 
 ## Como jogar
 

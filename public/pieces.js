@@ -4,6 +4,7 @@
  * Cada peça usa o mesmo desenho para as duas cores; o preenchimento,
  * o contorno e os detalhes vêm das variáveis CSS de .piece.white / .piece.black.
  */
+/* exported ChessPieces */
 const ChessPieces = (() => {
   const body = d => `<path class="pc-body" d="${d}"/>`;
   const line = d => `<path class="pc-line" d="${d}"/>`;
@@ -15,6 +16,7 @@ const ChessPieces = (() => {
     body('M27 82 C27 78 31 76 35 76 H65 C69 76 73 78 73 82 Z') +
     body('M20 91 C20 85 24 83 30 82 H70 C76 83 80 85 80 91 Z');
 
+  // prettier-ignore
   const SHAPES = {
     p: body('M37 77 C41 68 43 61 43 55 H57 C57 61 59 68 63 77 Z') +
        BASE +

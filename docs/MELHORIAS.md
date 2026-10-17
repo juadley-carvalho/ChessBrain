@@ -29,7 +29,7 @@ _Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos e
 | 14 | `bcrypt.hashSync`/`compareSync` bloqueiam o servidor                 | Back‑end    | 🟡 | Concluído |
 | 15 | Servidor sobe mesmo se o banco falhar ao abrir                       | Back‑end    | 🟡 | Concluído |
 | 16 | Modal de login não envia com Enter                                    | UX          | 🟢 | Concluído |
-| 17 | Sem testes automatizados, lint ou formatação                         | Qualidade   | 🟢 | Aberto |
+| 17 | Sem testes automatizados, lint ou formatação                         | Qualidade   | 🟢 | Concluído |
 | 18 | Organização de pastas e pequenas inconsistências                     | Código      | 🟢 | Concluído |
 | 19 | Acessibilidade do tabuleiro                                          | UX          | 🟢 | Concluído |
 
@@ -211,6 +211,8 @@ Os botões são `type="button"`, então Enter não faz nada. O modal também nã
 Nada impede regressões nas regras de xadrez nem puzzles inválidos (item 5).
 
 **Proposta:** adicionar testes do motor de regras com `node:test`, que já vem no Node sem dependência extra, e um teste que valida toda a `MATE_PUZZLES_DATABASE`. Configurar ESLint e Prettier, além de um script `npm run dev` com `node --watch server.js`.
+
+> **Resolvido:** `npm test` roda os testes em [tests/](../tests/) com `node:test`, sem dependência nova: regras do motor (lances de cada peça, capturas, cravada, promoção, xeque, mate, afogamento e busca de mate), validação de toda a `MATE_PUZZLES_DATABASE`, distância mínima dos desafios de movimentação e a API (sobe o servidor de verdade com um banco temporário via `DB_PATH` e testa cadastro, login, sessão, pontuação, ranking e que `server.js` e o banco não são servidos). `npm run lint` usa ESLint 9 com configuração própria para o Node e para os scripts do navegador, e `npm run format` / `npm run format:check` usam o Prettier em JS e CSS (o HTML fica de fora). `npm run dev` sobe o servidor com `node --watch`.
 
 ### 18. Organização de pastas e pequenas inconsistências
 - Front‑end e back‑end misturados na raiz. Sugestão: `public/` (HTML, CSS, JS do cliente), `src/` (servidor) e `data/` (banco).

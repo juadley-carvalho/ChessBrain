@@ -13,8 +13,11 @@ const ChessEngine = (() => {
     ['a1', 'b1', 'c1']
   ];
 
+  // prettier-ignore
   const ORTHOGONALS = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+  // prettier-ignore
   const DIAGONALS = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
+  // prettier-ignore
   const KNIGHT_STEPS = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]];
 
   const isInside = (r, c) => r >= 0 && r < 3 && c >= 0 && c < 3;
