@@ -90,6 +90,13 @@ h3,
   min-height: 70px;
 }
 
+.copyright {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-align: center;
+  padding: 4px 16px 16px;
+}
+
 .ad-sidebar {
   min-height: 200px;
   width: 100%;
@@ -146,22 +153,34 @@ h3,
 
 /* Ranking Formatado sem numeração duplicada */
 .ranking-card ol {
-  padding-left: 22px;
+  list-style: none;
+  counter-reset: rank;
 }
 
+/* Flex mantém nome e pontos na mesma linha; float jogava os pontos para a linha de baixo */
 .ranking-card li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
   margin-bottom: 8px;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
+  counter-increment: rank;
 }
 
-.ranking-card li::marker {
+.ranking-card li::before {
+  content: counter(rank) ".";
+  min-width: 1.4em;
   color: var(--gold);
   font-weight: 700;
 }
 
 .ranking-card li span:first-child {
-  margin-right: 10px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 #btn-logout {
@@ -183,8 +202,8 @@ h3,
   color: var(--text-color);
 }
 
-.ranking-card li span:last-child {
-  float: right;
+.ranking-card li span:last-child:not(:only-child) {
+  white-space: nowrap;
   color: var(--accent);
   font-weight: 700;
 }
