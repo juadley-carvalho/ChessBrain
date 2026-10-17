@@ -77,7 +77,8 @@ No servidor, dentro da pasta do projeto:
 
 ```bash
 git pull
-systemctl restart chessbrain   # reinicia o serviço do ChessBrain
+# reinicia o serviço do ChessBrain
+systemctl restart chessbrain
 ```
 
 O `git pull` não mexe em `data/chessbrain.db`, porque o banco não é versionado.
@@ -85,21 +86,30 @@ O `git pull` não mexe em `data/chessbrain.db`, porque o banco não é versionad
 **Só na primeira atualização depois que o banco saiu do Git** (versão 0.5.1), o `git pull` apagaria o banco do servidor. Nessa vez, guarde o banco antes e devolva depois:
 
 ```bash
-mv data/chessbrain.db /root/chessbrain.db.bak   # guarda o banco do servidor (/root sobrevive a reboot, ao contrário de /tmp)
-git pull                                        # remove a pasta data/, que ficou vazia
+# guarda o banco do servidor (/root sobrevive a reboot, ao contrário de /tmp)
+mv data/chessbrain.db /root/chessbrain.db.bak
+# remove a pasta data/, que ficou vazia
+git pull
+# devolve o banco do servidor
+mv /root/chessbrain.db.bak data/chessbrain.db
+# o serviço precisa escrever no banco e na pasta
 mkdir -p data
-mv /root/chessbrain.db.bak data/chessbrain.db   # devolve o banco do servidor
-chown -R chessbrain:chessbrain data             # o serviço precisa escrever no banco e na pasta
+chown -R chessbrain:chessbrain data
+# reinicia o serviço do ChessBrain
 systemctl restart chessbrain
 ```
 
 ## Testes e qualidade
 
 ```bash
-npm test               # testes do motor, dos puzzles, dos desafios e da API (node:test)
-npm run lint           # ESLint
-npm run format:check   # confere a formatação (Prettier); npm run format corrige
-npm run check:puzzles  # valida a base de puzzles de mate com relatório detalhado
+# testes do motor, dos puzzles, dos desafios e da API (node:test)
+npm test
+# ESLint
+npm run lint
+# confere a formatação (Prettier); npm run format corrige
+npm run format:check
+# valida a base de puzzles de mate com relatório detalhado
+npm run check:puzzles
 ```
 
 Os testes da API sobem o servidor numa porta aleatória com um banco temporário, então não alteram `data/chessbrain.db`.
