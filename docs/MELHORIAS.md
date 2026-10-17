@@ -5,7 +5,7 @@ Documento vivo com os problemas e oportunidades de melhoria encontrados no proje
 **Legenda de prioridade:** 🔴 Crítica · 🟠 Alta · 🟡 Média · 🟢 Baixa
 **Status:** `Aberto` · `Em andamento` · `Concluído` · `Descartado`
 
-_Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos resolvidos em seguida)_
+_Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos e de prioridade alta tratados em seguida)_
 
 ---
 
@@ -20,7 +20,7 @@ _Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos r
 | 5  | Puzzle "Mate em 3" é impossível de resolver                          | Jogo        | 🟠 | Concluído |
 | 6  | Modos "Mate em 4" a "Mate em 10" carregam o puzzle de mate em 1      | Jogo        | 🟠 | Concluído |
 | 7  | Jogador pode mover peças durante as esperas (`setTimeout`)           | Jogo        | 🟠 | Concluído |
-| 8  | Sem limite de tentativas de login e sem regras de senha              | Segurança   | 🟠 | Aberto |
+| 8  | Sem limite de tentativas de login e sem regras de senha              | Segurança   | 🟠 | Descartado |
 | 9  | Pontuação de login não é carregada; o placar recomeça em 0           | Jogo        | 🟡 | Aberto |
 | 10 | Mate validado só pela sequência exata, não por xeque‑mate real       | Jogo        | 🟡 | Aberto |
 | 11 | Sem promoção de peão                                                  | Jogo        | 🟡 | Aberto |
@@ -124,6 +124,8 @@ A base só tem puzzles para 1, 2 e 3 lances. Nos outros modos o código cai sile
 Qualquer senha é aceita (até um único caractere) e não há limite de tentativas, o que permite força bruta.
 
 **Proposta:** exigir senha mínima de 6 a 8 caracteres e limitar o tamanho máximo (o bcrypt ignora o que passa de 72 bytes). Aplicar `express-rate-limit` em `/api/login` e `/api/register`.
+
+> **Descartado:** o login é simples de propósito e serve só para guardar o nome e o placar do jogador no ranking. Limite de tentativas e regras de senha deixariam o projeto mais complexo do que o necessário. Novas melhorias de autenticação devem seguir essa mesma linha: manter o login simples.
 
 ---
 
