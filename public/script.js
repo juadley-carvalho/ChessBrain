@@ -27,6 +27,10 @@ class Chess3x3 {
     this.timerInterval = null;
     this.startTime = null;
     this.isCompleted = false;
+    // Recomeços do desafio atual (lance errado, afogamento ou Reiniciar); cada um tira pontos
+    this.mistakes = 0;
+    // Impede pontuar de novo o mesmo desafio depois de concluído e reiniciado
+    this.pointsAwarded = false;
     // Bloqueia a entrada enquanto há uma ação agendada (resposta das pretas ou reinício)
     this.isLocked = false;
     this.pendingTimeouts = [];
@@ -144,11 +148,19 @@ class Chess3x3 {
       challenge = ChallengeGenerator.getMateChallenge(mateInX, currentId);
     }
     this.currentChallenge = challenge || ChallengeGenerator.generateRandomMoveChallenge();
+    this.mistakes = 0;
+    this.pointsAwarded = false;
 
     this.loadChallenge(this.currentChallenge);
   }
 
-  loadChallenge(challenge) {
+  // Recomeça o desafio atual contando um erro (se já houve lance); o cronômetro continua de onde estava
+  retryChallenge() {
+    if (!this.pointsAwarded && this.moveHistory.length > 0) this.mistakes++;
+    this.loadChallenge(this.currentChallenge, { keepTimer: !this.pointsAwarded });
+  }
+
+  loadChallenge(challenge, { keepTimer = false } = {}) {
     this.cancelPendingActions();
     this.isLocked = false;
     this.board = challenge.initialBoard.map(row => [...row]);
@@ -169,7 +181,7 @@ class Chess3x3 {
     }
 
     this.clearSelection();
-    this.startTimer();
+    this.startTimer(keepTimer);
     this.render();
   }
 
@@ -192,9 +204,9 @@ class Chess3x3 {
     document.getElementById('target-board').setAttribute('aria-label', `Objetivo alvo: ${placed.join(', ')}`);
   }
 
-  startTimer() {
+  startTimer(keepStart = false) {
     this.stopTimer();
-    this.startTime = Date.now();
+    if (!keepStart || this.startTime === null) this.startTime = Date.now();
     const timerEl = document.getElementById('timer');
 
     this.timerInterval = setInterval(() => {
@@ -422,7 +434,7 @@ class Chess3x3 {
       if (ChessEngine.isStalemate(this.board, false)) {
         this.setFeedback('Empate por Afogamento! As pretas não têm lances válidos.', 'error');
         this.lockInput();
-        this.schedule(() => this.loadChallenge(this.currentChallenge), 1500);
+        this.schedule(() => this.retryChallenge(), 1500);
         return;
       }
     }
@@ -445,7 +457,7 @@ class Chess3x3 {
       if (!ChessEngine.mateAfterWhiteMove(this.board, remaining)) {
         this.setFeedback('Jogada incorreta! Tente novamente.', 'error');
         this.lockInput();
-        this.schedule(() => this.loadChallenge(this.currentChallenge), 1200);
+        this.schedule(() => this.retryChallenge(), 1200);
         return;
       }
 
@@ -469,13 +481,20 @@ class Chess3x3 {
     this.isCompleted = true;
     this.stopTimer();
 
+    if (this.pointsAwarded) {
+      this.setFeedback('Desafio Concluído! Ele já foi pontuado; avance para o próximo.', 'success');
+      return;
+    }
+    this.pointsAwarded = true;
+
     const elapsedSeconds = (Date.now() - this.startTime) / 1000;
-    const pointsGained = Math.max(100, Math.floor(1000 - elapsedSeconds * 10));
+    const pointsGained = ChallengeGenerator.points(this.currentChallenge, elapsedSeconds, this.mistakes);
     this.sessionScore += pointsGained;
     this.renderScores();
 
     const saveHint = this.currentUser ? '' : ' (entre para salvar no ranking)';
-    this.setFeedback(`Desafio Concluído! +${pointsGained} pontos${saveHint}`, 'success');
+    const mistakesHint = this.mistakes ? ` (${this.mistakes} ${this.mistakes === 1 ? 'erro' : 'erros'})` : '';
+    this.setFeedback(`Desafio Concluído! +${pointsGained} pontos${mistakesHint}${saveHint}`, 'success');
 
     // Soma os pontos ao total da conta caso o jogador esteja logado
     this.saveUserScore(pointsGained);
@@ -665,7 +684,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-submit-register').addEventListener('click', () => authenticate('register'));
 
   document.getElementById('btn-reset').addEventListener('click', () => {
-    game.loadChallenge(game.currentChallenge);
+    game.retryChallenge();
   });
 
   document.getElementById('btn-next').addEventListener('click', () => {

@@ -9,6 +9,26 @@ class ChallengeGenerator {
   // Contador dos desafios de movimentação gerados (Date.now() podia repetir o ID)
   static moveChallengeCount = 0;
 
+  // Regras de pontuação por tipo de desafio (ver README, seção Pontuação).
+  // No mate, perLevel soma pontos a cada jogada além da primeira (mate em 1 = 400, mate em 7 = 1000).
+  static SCORING = {
+    move: { base: 300, perLevel: 0, perMistake: 50, perSecond: 0, min: 50 },
+    mate: { base: 400, perLevel: 100, perMistake: 150, perSecond: 10, min: 100 }
+  };
+
+  /**
+   * Pontos de um desafio concluído. Movimentação vale menos e só perde por erro;
+   * mate vale mais quanto mais longo e perde com o tempo e com cada erro.
+   * Nunca fica abaixo do mínimo do tipo.
+   */
+  static points(challenge, elapsedSeconds, mistakes) {
+    const rule = ChallengeGenerator.SCORING[challenge.type];
+    const level = challenge.type === 'mate' ? challenge.solution.length : 1;
+    const base = rule.base + (level - 1) * rule.perLevel;
+    const raw = base - elapsedSeconds * rule.perSecond - mistakes * rule.perMistake;
+    return Math.max(rule.min, Math.floor(raw));
+  }
+
   /**
    * Gera um desafio aleatório de Movimentação (Royal Study) em tempo de execução.
    * Usa no máximo 1 peça de cada tipo (Peão, Torre, Bispo, Cavalo, Rei, Dama) e escolhe

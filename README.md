@@ -13,7 +13,7 @@ Jogo web de desafios de xadrez em um **tabuleiro 3x3**. O jogador resolve dois t
 - **Interação por clique ou arrastar‑e‑soltar** (Pointer Events, funciona com mouse e toque), com destaque de lances legais e de capturas.
 - **Acessibilidade**: tabuleiro jogável pelo teclado, casas descritas para leitores de tela e lances anunciados em voz alta.
 - **Regras de xadrez aplicadas ao 3x3**: movimentos de todas as peças, bloqueio de lances que deixam o próprio rei em xeque e detecção de afogamento.
-- **Cronômetro e pontuação** — cada desafio vale entre 100 e 1000 pontos, conforme o tempo gasto.
+- **Cronômetro e pontuação** — mate vale de 400 (mate em 1) a 1000 (mate em 7) e cai com o tempo e com os erros; movimentação vale até 300 e cai só com os erros.
 - **Cadastro e login** com senha criptografada (bcrypt).
 - **Ranking geral (Top 10)** persistido em SQLite.
 - Espaços reservados para anúncios (topo, laterais e rodapé).
@@ -128,9 +128,12 @@ Peças são representadas por letras: maiúsculas = brancas (`K Q R B N P`), min
 
 ### Pontuação
 
-```
-pontos = max(100, floor(1000 - segundos * 10))
-```
+| Desafio      | Fórmula                                                              |
+| ------------ | -------------------------------------------------------------------- |
+| Mate em X    | `max(100, floor(400 + (X - 1) * 100 - segundos * 10 - erros * 150))` |
+| Movimentação | `max(50, 300 - erros * 50)`                                          |
+
+Conta como **erro** cada recomeço do mesmo desafio depois de pelo menos um lance: jogada incorreta no mate, afogamento ou o botão **Reiniciar**. O cronômetro não zera nesses recomeços, só ao passar para outro desafio. Um desafio já concluído não pontua de novo se for reiniciado. As regras ficam em `ChallengeGenerator.SCORING` ([public/challenges.js](public/challenges.js)).
 
 A pontuação é **acumulada**: os pontos de cada desafio concluído são somados ao total da conta, que é o valor usado no ranking. O painel mostra os pontos da **Sessão** (desde que a página foi aberta) e o **Total** salvo, carregado ao fazer login. Pontos feitos como visitante não são salvos.
 

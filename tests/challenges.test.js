@@ -45,3 +45,28 @@ test('desafios de movimentação têm IDs diferentes', () => {
   const b = ChallengeGenerator.generateRandomMoveChallenge();
   assert.notEqual(a.id, b.id);
 });
+
+test('movimentação vale menos que mate e perde pontos só por erro', () => {
+  const move = { type: 'move' };
+  assert.equal(ChallengeGenerator.points(move, 0, 0), 300);
+  assert.equal(ChallengeGenerator.points(move, 120, 0), 300);
+  assert.equal(ChallengeGenerator.points(move, 0, 2), 200);
+  assert.equal(ChallengeGenerator.points(move, 0, 20), 50);
+});
+
+test('mate vale mais quanto mais longo e perde pontos com o tempo e com cada erro', () => {
+  const mateIn = n => MATE_PUZZLES_DATABASE[n][0];
+  assert.equal(ChallengeGenerator.points(mateIn(1), 0, 0), 400);
+  assert.equal(ChallengeGenerator.points(mateIn(3), 0, 0), 600);
+  assert.equal(ChallengeGenerator.points(mateIn(7), 0, 0), 1000);
+  assert.equal(ChallengeGenerator.points(mateIn(7), 10.5, 0), 895);
+  assert.equal(ChallengeGenerator.points(mateIn(7), 10, 2), 600);
+  assert.equal(ChallengeGenerator.points(mateIn(1), 300, 5), 100);
+});
+
+test('nenhum desafio passa do limite de pontos aceito pelo servidor', () => {
+  for (const level of Object.keys(MATE_PUZZLES_DATABASE)) {
+    const puzzle = MATE_PUZZLES_DATABASE[level][0];
+    assert.ok(ChallengeGenerator.points(puzzle, 0, 0) <= 1000, `Mate em ${level}`);
+  }
+});
