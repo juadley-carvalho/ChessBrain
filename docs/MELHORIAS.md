@@ -5,7 +5,7 @@ Documento vivo com os problemas e oportunidades de melhoria encontrados no proje
 **Legenda de prioridade:** 🔴 Crítica · 🟠 Alta · 🟡 Média · 🟢 Baixa
 **Status:** `Aberto` · `Em andamento` · `Concluído` · `Descartado`
 
-_Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos e de prioridade alta tratados em seguida)_
+_Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0). Todos os itens foram tratados; restam as ideias do backlog no fim do documento._
 
 ---
 
