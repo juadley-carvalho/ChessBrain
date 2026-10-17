@@ -22,7 +22,7 @@ _Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos e
 | 7  | Jogador pode mover peças durante as esperas (`setTimeout`)           | Jogo        | 🟠 | Concluído |
 | 8  | Sem limite de tentativas de login e sem regras de senha              | Segurança   | 🟠 | Descartado |
 | 9  | Pontuação de login não é carregada; o placar recomeça em 0           | Jogo        | 🟡 | Concluído |
-| 10 | Mate validado só pela sequência exata, não por xeque‑mate real       | Jogo        | 🟡 | Aberto |
+| 10 | Mate validado só pela sequência exata, não por xeque‑mate real       | Jogo        | 🟡 | Concluído |
 | 11 | Sem promoção de peão                                                  | Jogo        | 🟡 | Concluído |
 | 12 | Desafio de movimentação pode gerar alvo trivial ou igual ao inicial  | Jogo        | 🟡 | Aberto |
 | 13 | Lógica de movimento duplicada entre `script.js` e `challenges.js`    | Código      | 🟡 | Concluído |
@@ -146,6 +146,8 @@ O login devolve `user.score`, mas `totalScore` continua em 0 e o painel "Pontua�
 O jogo compara os lances com `solution`. Se o jogador encontrar outro mate válido, ele recebe "Jogada incorreta". O motor também nunca confirma que a posição final é de fato xeque‑mate.
 
 **Proposta:** ao final da sequência (ou a cada lance), verificar `isKingInCheck(false) && !hasLegalMoves(false)`. Aceitar qualquer lance que mantenha o mate forçado no número de lances restantes, o que é viável de calcular num 3x3. A resposta das pretas também poderia ser calculada pelo motor, em vez de fixa.
+
+> **Resolvido:** a busca de mate (`canMateIn`, `mateAfterWhiteMove`, `mateMoves`, `bestDefenses`) foi do validador para o `engine.js`. A cada lance o jogo confere se as pretas estão em xeque‑mate (desafio concluído) ou se o mate continua forçado nos lances restantes. Se não estiver, o lance é marcado como incorreto. A resposta das pretas é calculada pelo motor entre as melhores defesas, e a resposta cadastrada é usada quando é uma delas. `solution` passa a servir de referência e para o validador.
 
 ### 11. Sem promoção de peão
 **Onde:** [script.js:474-484](../script.js#L474-L484)

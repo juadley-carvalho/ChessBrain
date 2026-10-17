@@ -155,7 +155,7 @@ Os puzzles ficam em `MATE_PUZZLES_DATABASE`, no arquivo [public/challenges.js](p
 
 Regras importantes:
 - `solution` deve ter exatamente X lances e `blackResponses`, X − 1.
-- Como o jogo compara a sequência exata, cada lance da solução precisa ser o **único** que mantém o mate no número de lances restantes.
+- O jogo aceita qualquer lance que mantenha o mate forçado nos lances restantes e calcula a resposta das pretas (melhor defesa, de preferência a cadastrada). Mesmo assim, para o puzzle ter uma resposta clara, cada lance da solução deve ser o **único** que mantém o mate no número de lances restantes.
 - Cada resposta das pretas deve ser legal e a melhor defesa (a que adia o mate ao máximo).
 - Nenhum lance das brancas pode deixar as pretas afogadas antes do mate, porque o jogo detecta o afogamento e reinicia o desafio.
 - Peões só podem começar na linha do meio. Ao chegar à última linha, o peão é promovido a Dama automaticamente.

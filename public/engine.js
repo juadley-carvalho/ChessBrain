@@ -137,6 +137,58 @@ const ChessEngine = (() => {
   const sameMove = (a, b) =>
     !!a && !!b && a.from.r === b.from.r && a.from.c === b.from.c && a.to.r === b.to.r && a.to.c === b.to.c;
 
+  // ==========================================
+  // Busca: brancas forçam mate em até n lances?
+  // ==========================================
+
+  const boardKey = (board) => board.map(row => row.map(p => p || '.').join('')).join('/');
+  const memo = new Map();
+
+  // Brancas a jogar
+  function canMateIn(board, n) {
+    if (n <= 0) return false;
+    const k = boardKey(board) + n;
+    if (memo.has(k)) return memo.get(k);
+
+    let result = false;
+    for (const move of legalMoves(board, true)) {
+      if (mateAfterWhiteMove(applyMove(board, move), n)) { result = true; break; }
+    }
+    memo.set(k, result);
+    return result;
+  }
+
+  // Pretas a jogar, depois de um lance branco: o mate continua forçado em até n lances (contando esse)?
+  function mateAfterWhiteMove(board, n) {
+    const replies = legalMoves(board, false);
+    if (replies.length === 0) return isKingInCheck(board, false); // mate (true) ou afogamento (false)
+    if (n <= 1) return false;
+    return replies.every(reply => canMateIn(applyMove(board, reply), n - 1));
+  }
+
+  // Menor n (até max) em que as brancas forçam o mate; Infinity se não houver
+  function mateDistance(board, max) {
+    for (let n = 1; n <= max; n++) {
+      if (canMateIn(board, n)) return n;
+    }
+    return Infinity;
+  }
+
+  // Lances brancos que mantêm o mate em n
+  function mateMoves(board, n) {
+    return legalMoves(board, true).filter(m => mateAfterWhiteMove(applyMove(board, m), n));
+  }
+
+  // Respostas pretas que adiam o mate ao máximo (melhor defesa), dentro de n-1
+  function bestDefenses(board, n) {
+    const replies = legalMoves(board, false).map(reply => ({
+      reply,
+      distance: mateDistance(applyMove(board, reply), n - 1)
+    }));
+    const longest = Math.max(...replies.map(x => x.distance));
+    return replies.filter(x => x.distance === longest).map(x => x.reply);
+  }
+
   return {
     COORDS,
     isWhitePiece,
@@ -150,7 +202,13 @@ const ChessEngine = (() => {
     legalMoves,
     isMate,
     isStalemate,
-    sameMove
+    sameMove,
+    boardKey,
+    canMateIn,
+    mateAfterWhiteMove,
+    mateDistance,
+    mateMoves,
+    bestDefenses
   };
 })();
 

@@ -12,7 +12,7 @@
  *   - a posição inicial é legal (pretas fora de xeque, peões só na linha do meio);
  *   - o mate mais rápido possível leva exatamente N lances;
  *   - em cada passo, o lance da solução é o ÚNICO que mantém o mate no número de
- *     lances restantes (o jogo compara a sequência exata);
+ *     lances restantes (o jogo aceita alternativas, mas o puzzle fica mais claro);
  *   - cada resposta das pretas é legal e é a melhor defesa (adia o mate ao máximo);
  *   - nenhum lance da linha principal afoga as pretas e o último lance dá xeque-mate.
  */
@@ -21,59 +21,10 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-const { COORDS, isKingInCheck, applyMove, legalMoves, isMate, isStalemate, sameMove } = require('../public/engine.js');
-
-// ==========================================
-// Busca: brancas forçam mate em até n lances?
-// ==========================================
-
-const key = (board) => board.map(row => row.map(p => p || '.').join('')).join('/');
-const memo = new Map();
-
-// Brancas a jogar
-function canMateIn(board, n) {
-  if (n <= 0) return false;
-  const k = key(board) + n;
-  if (memo.has(k)) return memo.get(k);
-
-  let result = false;
-  for (const move of legalMoves(board, true)) {
-    if (mateAfterWhiteMove(applyMove(board, move), n)) { result = true; break; }
-  }
-  memo.set(k, result);
-  return result;
-}
-
-// Pretas a jogar, depois de um lance branco que fazia parte de um "mate em n"
-function mateAfterWhiteMove(board, n) {
-  const replies = legalMoves(board, false);
-  if (replies.length === 0) return isKingInCheck(board, false); // mate (true) ou afogamento (false)
-  if (n === 1) return false;
-  return replies.every(reply => canMateIn(applyMove(board, reply), n - 1));
-}
-
-// Menor n (até max) em que as brancas forçam o mate; Infinity se não houver
-function mateDistance(board, max) {
-  for (let n = 1; n <= max; n++) {
-    if (canMateIn(board, n)) return n;
-  }
-  return Infinity;
-}
-
-// Lances brancos que mantêm o mate em n
-function mateMoves(board, n) {
-  return legalMoves(board, true).filter(m => mateAfterWhiteMove(applyMove(board, m), n));
-}
-
-// Respostas pretas que adiam o mate ao máximo (melhor defesa), dentro de n-1
-function bestDefenses(board, n) {
-  const replies = legalMoves(board, false).map(reply => ({
-    reply,
-    distance: mateDistance(applyMove(board, reply), n - 1)
-  }));
-  const longest = Math.max(...replies.map(x => x.distance));
-  return replies.filter(x => x.distance === longest).map(x => x.reply);
-}
+const {
+  COORDS, boardKey, isKingInCheck, applyMove, legalMoves, isMate, isStalemate, sameMove,
+  mateDistance, mateMoves, bestDefenses
+} = require('../public/engine.js');
 
 const notation = (board, m) => `${board[m.from.r][m.from.c]}${COORDS[m.from.r][m.from.c]}-${COORDS[m.to.r][m.to.c]}`;
 
@@ -190,7 +141,7 @@ function canonicalKey(board) {
         out[nr][nc] = board[r][c];
       }
     }
-    return key(out);
+    return boardKey(out);
   }).sort()[0];
 }
 

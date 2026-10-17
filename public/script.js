@@ -387,34 +387,37 @@ class Chess3x3 {
         this.completeChallenge();
       }
     } else if (challenge.type === 'mate') {
+      // Vale qualquer lance que mantenha o mate forçado nos lances restantes, não só o da solução
       const stepIndex = this.moveHistory.length - 1;
-      const expectedMove = challenge.solution[stepIndex];
+      const remaining = challenge.solution.length - stepIndex;
 
-      if (!expectedMove || 
-          expectedMove.from.r !== this.moveHistory[stepIndex].from.r ||
-          expectedMove.from.c !== this.moveHistory[stepIndex].from.c ||
-          expectedMove.to.r !== this.moveHistory[stepIndex].to.r ||
-          expectedMove.to.c !== this.moveHistory[stepIndex].to.c) {
-        
+      if (ChessEngine.isMate(this.board, false)) {
+        this.completeChallenge();
+        return;
+      }
+
+      if (!ChessEngine.mateAfterWhiteMove(this.board, remaining)) {
         this.setFeedback('Jogada incorreta! Tente novamente.', 'error');
         this.lockInput();
         this.schedule(() => this.loadChallenge(this.currentChallenge), 1200);
         return;
       }
 
-      if (this.moveHistory.length < challenge.solution.length) {
-        const blackMove = challenge.blackResponses[stepIndex];
-        if (blackMove) {
-          this.lockInput();
-          this.schedule(() => {
-            this.isLocked = false;
-            this.executeMove(blackMove.from, blackMove.to, true);
-          }, 600);
-        }
-      } else {
-        this.completeChallenge();
-      }
+      const blackMove = this.chooseBlackResponse(stepIndex, remaining);
+      this.lockInput();
+      this.schedule(() => {
+        this.isLocked = false;
+        this.executeMove(blackMove.from, blackMove.to, true);
+      }, 600);
     }
+  }
+
+  // Melhor defesa das pretas; usa a resposta cadastrada quando ela é uma das melhores
+  chooseBlackResponse(stepIndex, remaining) {
+    const defenses = ChessEngine.bestDefenses(this.board, remaining);
+    const stored = (this.currentChallenge.blackResponses || [])[stepIndex];
+    return defenses.find(m => ChessEngine.sameMove(m, stored)) ||
+      defenses[Math.floor(Math.random() * defenses.length)];
   }
 
   completeChallenge() {
