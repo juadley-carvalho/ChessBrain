@@ -4,11 +4,6 @@
 
 const { COORDS } = ChessEngine;
 
-const PIECE_SYMBOLS = {
-  'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
-  'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
-};
-
 class Chess3x3 {
   constructor() {
     this.board = Array(3).fill(null).map(() => Array(3).fill(null));
@@ -94,7 +89,7 @@ class Chess3x3 {
       ChallengeGenerator.getMateLevels().forEach(n => {
         const option = document.createElement('option');
         option.value = `mate-${n}`;
-        option.textContent = `⚔️ Mate em ${n} ${n === 1 ? 'Jogada' : 'Jogadas'}`;
+        option.textContent = `Mate em ${n} ${n === 1 ? 'Jogada' : 'Jogadas'}`;
         selectEl.appendChild(option);
       });
 
@@ -154,11 +149,7 @@ class Chess3x3 {
 
         const piece = targetBoard[r][c];
         if (piece) {
-          const pieceEl = document.createElement('div');
-          const isWhite = piece === piece.toUpperCase();
-          pieceEl.className = `piece ${isWhite ? 'white' : 'black'}`;
-          pieceEl.textContent = PIECE_SYMBOLS[piece];
-          squareEl.appendChild(pieceEl);
+          squareEl.appendChild(ChessPieces.create(piece));
         }
       }
     }
@@ -222,11 +213,8 @@ class Chess3x3 {
 
         const piece = this.board[r][c];
         if (piece) {
-          const pieceEl = document.createElement('div');
+          const pieceEl = ChessPieces.create(piece);
           const isWhite = piece === piece.toUpperCase();
-          
-          pieceEl.className = `piece ${isWhite ? 'white' : 'black'}`;
-          pieceEl.textContent = PIECE_SYMBOLS[piece];
 
           if (!this.isCompleted && !this.isLocked && isWhite) {
             pieceEl.addEventListener('pointerdown', (e) => this.handlePointerDown(e, r, c));

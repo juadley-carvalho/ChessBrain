@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ChessBrain - Desafios de Xadrez 3x3</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -35,9 +38,9 @@
         
         <!-- Seletor de Modo de Jogo -->
         <div class="mode-selector-container">
-          <label for="select-mode"><strong>Modo de Desafio:</strong></label>
+          <label for="select-mode">Modo de Desafio</label>
           <select id="select-mode" class="mode-select">
-            <option value="move">🧩 Movimentação Aleatória</option>
+            <option value="move">Movimentação Aleatória</option>
             <!-- Modos de mate gerados a partir de MATE_PUZZLES_DATABASE (script.js) -->
           </select>
         </div>
@@ -79,14 +82,14 @@
 
       <div class="game-controls">
         <button id="btn-reset" class="btn-secondary">Reiniciar Desafio</button>
-        <button id="btn-next" class="btn-primary">Próximo Desafio 🎲</button>
+        <button id="btn-next" class="btn-primary">Próximo Desafio</button>
       </div>
     </main>
 
     <!-- Barra Lateral Direita: Ranking Geral -->
     <aside class="sidebar right-sidebar">
       <div class="card ranking-card">
-        <h3>Ranking Geral 🏆</h3>
+        <h3>Ranking Geral</h3>
         <ol id="leaderboard-list">
           <!-- Carregado dinamicamente via API -->
         </ol>
@@ -127,6 +130,7 @@
     <div class="ad-placeholder">Espaço de Anúncio (Rodapé - 728x90)</div>
   </footer>
 
+  <script src="pieces.js"></script>
   <script src="engine.js"></script>
   <script src="challenges.js"></script>
   <script src="script.js"></script>
