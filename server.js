@@ -5,6 +5,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcryptjs');
 
@@ -14,8 +15,15 @@ const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const DATA_DIR = path.join(__dirname, 'data');
 
+const SESSION_COOKIE = 'chessbrain_session';
+const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 dias
+
+// Regras de validação
+// Pontuação máxima por desafio é 1000; limite generoso para o total de uma sessão
+const MAX_SCORE = 1000000;
+
 // Middlewares para aceitar dados JSON nas requisições
-app.use(express.json());
+app.use(express.json({ limit: '10kb' }));
 // Apenas a pasta public/ é servida; banco e código do servidor ficam inacessíveis
 app.use(express.static(PUBLIC_DIR));
 
@@ -53,8 +61,90 @@ function initDatabase() {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // Tabela de Sessões (token aleatório guardado em cookie httpOnly)
+    db.run(`
+      CREATE TABLE IF NOT EXISTS sessions (
+        token TEXT PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        expires_at INTEGER NOT NULL
+      )
+    `);
+
+    db.run(`DELETE FROM sessions WHERE expires_at < ?`, [Date.now()]);
   });
 }
+
+// ==========================================
+// 🔐 SESSÕES
+// ==========================================
+
+function parseCookies(header) {
+  const cookies = {};
+  if (!header) return cookies;
+  header.split(';').forEach(part => {
+    const idx = part.indexOf('=');
+    if (idx === -1) return;
+    const name = part.slice(0, idx).trim();
+    const value = part.slice(idx + 1).trim();
+    try {
+      cookies[name] = decodeURIComponent(value);
+    } catch {
+      cookies[name] = value;
+    }
+  });
+  return cookies;
+}
+
+function createSession(req, res, userId, callback) {
+  const token = crypto.randomBytes(32).toString('hex');
+  const expiresAt = Date.now() + SESSION_TTL_MS;
+
+  db.run(
+    `INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)`,
+    [token, userId, expiresAt],
+    (err) => {
+      if (err) return callback(err);
+      res.cookie(SESSION_COOKIE, token, {
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: req.secure,
+        maxAge: SESSION_TTL_MS,
+        path: '/'
+      });
+      callback(null);
+    }
+  );
+}
+
+// Carrega o usuário da sessão em req.user (ou null)
+function loadSession(req, res, next) {
+  const token = parseCookies(req.headers.cookie)[SESSION_COOKIE];
+  req.user = null;
+  req.sessionToken = null;
+  if (!token) return next();
+
+  const query = `
+    SELECT u.id, u.username, u.score
+    FROM sessions s JOIN users u ON u.id = s.user_id
+    WHERE s.token = ? AND s.expires_at > ?
+  `;
+  db.get(query, [token, Date.now()], (err, user) => {
+    if (err) return res.status(500).json({ error: 'Erro ao validar sessão.' });
+    req.user = user || null;
+    req.sessionToken = user ? token : null;
+    next();
+  });
+}
+
+function requireAuth(req, res, next) {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Faça login para continuar.' });
+  }
+  next();
+}
+
+app.use('/api', loadSession);
 
 // ==========================================
 // 🚀 ENDPOINTS DA API REST
@@ -64,15 +154,17 @@ function initDatabase() {
 app.post('/api/register', (req, res) => {
   const { username, password } = req.body;
 
-  if (!username || !password || username.trim() === '') {
+  if (typeof username !== 'string' || typeof password !== 'string' || !password || username.trim() === '') {
     return res.status(400).json({ error: 'Nome de usuário e senha são obrigatórios.' });
   }
+
+  const cleanUsername = username.trim();
 
   // Criptografa a senha antes de salvar
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   const query = `INSERT INTO users (username, password) VALUES (?, ?)`;
-  db.run(query, [username.trim(), hashedPassword], function (err) {
+  db.run(query, [cleanUsername, hashedPassword], function (err) {
     if (err) {
       if (err.message.includes('UNIQUE constraint failed')) {
         return res.status(400).json({ error: 'Este nome de usuário já está em uso.' });
@@ -80,9 +172,15 @@ app.post('/api/register', (req, res) => {
       return res.status(500).json({ error: 'Erro ao cadastrar usuário.' });
     }
 
-    res.json({
-      success: true,
-      user: { id: this.lastID, username: username.trim(), score: 0 }
+    const userId = this.lastID;
+    createSession(req, res, userId, (sessionErr) => {
+      if (sessionErr) {
+        return res.status(500).json({ error: 'Erro ao criar sessão.' });
+      }
+      res.json({
+        success: true,
+        user: { id: userId, username: cleanUsername, score: 0 }
+      });
     });
   });
 });
@@ -91,39 +189,58 @@ app.post('/api/register', (req, res) => {
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
 
-  if (!username || !password) {
+  if (typeof username !== 'string' || typeof password !== 'string' || !username || !password) {
     return res.status(400).json({ error: 'Preencha todos os campos.' });
   }
 
   const query = `SELECT * FROM users WHERE username = ?`;
   db.get(query, [username.trim()], (err, user) => {
-    if (err || !user) {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao consultar usuário.' });
+    }
+    if (!user || !bcrypt.compareSync(password, user.password)) {
       return res.status(401).json({ error: 'Usuário ou senha inválidos.' });
     }
 
-    const isPasswordValid = bcrypt.compareSync(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Usuário ou senha inválidos.' });
-    }
-
-    res.json({
-      success: true,
-      user: { id: user.id, username: user.username, score: user.score }
+    createSession(req, res, user.id, (sessionErr) => {
+      if (sessionErr) {
+        return res.status(500).json({ error: 'Erro ao criar sessão.' });
+      }
+      res.json({
+        success: true,
+        user: { id: user.id, username: user.username, score: user.score }
+      });
     });
   });
 });
 
-// Rota 3: Salvar / Atualizar Pontuação do Jogador
-app.post('/api/score', (req, res) => {
-  const { username, score } = req.body;
+// Rota 3: Usuário da sessão atual
+app.get('/api/me', (req, res) => {
+  res.json({ user: req.user });
+});
 
-  if (!username || score === undefined) {
-    return res.status(400).json({ error: 'Dados inválidos.' });
+// Rota 4: Logout (remove a sessão)
+app.post('/api/logout', (req, res) => {
+  res.clearCookie(SESSION_COOKIE, { path: '/' });
+  if (!req.sessionToken) return res.json({ success: true });
+
+  db.run(`DELETE FROM sessions WHERE token = ?`, [req.sessionToken], (err) => {
+    if (err) return res.status(500).json({ error: 'Erro ao encerrar sessão.' });
+    res.json({ success: true });
+  });
+});
+
+// Rota 5: Salvar / Atualizar Pontuação do Jogador logado
+app.post('/api/score', requireAuth, (req, res) => {
+  const { score } = req.body;
+
+  if (!Number.isInteger(score) || score < 0 || score > MAX_SCORE) {
+    return res.status(400).json({ error: 'Pontuação inválida.' });
   }
 
   // Atualiza a pontuação apenas se a nova pontuação for maior que a cadastrada
-  const query = `UPDATE users SET score = MAX(score, ?) WHERE username = ?`;
-  db.run(query, [score, username], function (err) {
+  const query = `UPDATE users SET score = MAX(score, ?) WHERE id = ?`;
+  db.run(query, [score, req.user.id], function (err) {
     if (err) {
       return res.status(500).json({ error: 'Erro ao atualizar pontuação.' });
     }
@@ -131,7 +248,7 @@ app.post('/api/score', (req, res) => {
   });
 });
 
-// Rota 4: Obter Ranking Geral (Top 10)
+// Rota 6: Obter Ranking Geral (Top 10)
 app.get('/api/leaderboard', (req, res) => {
   const query = `SELECT username, score FROM users ORDER BY score DESC LIMIT 10`;
   db.all(query, [], (err, rows) => {

@@ -94,13 +94,15 @@ A pontuação da sessão é acumulada e enviada ao servidor a cada desafio concl
 
 ## API REST
 
-Todas as rotas recebem e devolvem JSON.
+Todas as rotas recebem e devolvem JSON. Login e cadastro criam uma sessão guardada no cookie `chessbrain_session` (`HttpOnly`, válido por 30 dias), e é por ela que o servidor sabe de quem é a pontuação.
 
 | Método | Rota               | Corpo                                  | Descrição                                                         |
 |--------|--------------------|----------------------------------------|-------------------------------------------------------------------|
-| POST   | `/api/register`    | `{ "username", "password" }`           | Cadastra o usuário. Retorna `{ success, user: { id, username, score } }`. |
-| POST   | `/api/login`       | `{ "username", "password" }`           | Autentica. Retorna `{ success, user: { id, username, score } }`.  |
-| POST   | `/api/score`       | `{ "username", "score" }`              | Atualiza a pontuação se `score` for maior que a atual.            |
+| POST   | `/api/register`    | `{ "username", "password" }`           | Cadastra o usuário e abre a sessão. Retorna `{ success, user: { id, username, score } }`. |
+| POST   | `/api/login`       | `{ "username", "password" }`           | Autentica e abre a sessão. Retorna `{ success, user: { id, username, score } }`. |
+| GET    | `/api/me`          | —                                      | Retorna o usuário da sessão: `{ user }` (ou `{ user: null }`).    |
+| POST   | `/api/logout`      | —                                      | Encerra a sessão.                                                 |
+| POST   | `/api/score`       | `{ "score" }`                          | **Exige sessão.** Atualiza a pontuação do usuário logado se `score` (inteiro de 0 a 1.000.000) for maior que a atual. |
 | GET    | `/api/leaderboard` | —                                      | Retorna os 10 melhores: `[{ username, score }]`.                  |
 
 Erros retornam `{ "error": "mensagem" }` com status `400`, `401` ou `500`.
@@ -116,6 +118,8 @@ Tabela `users`:
 | `password`   | TEXT     | Hash bcrypt (custo 10)         |
 | `score`      | INTEGER  | Padrão 0 (maior pontuação)     |
 | `created_at` | DATETIME | Padrão `CURRENT_TIMESTAMP`     |
+
+Tabela `sessions`: `token` (TEXT, PK, aleatório), `user_id` (FK para `users`) e `expires_at` (timestamp em ms).
 
 ## Adicionando puzzles de mate
 

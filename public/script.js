@@ -23,6 +23,7 @@ class Chess3x3 {
     this.currentChallenge = null;
     this.moveHistory = [];
     this.totalScore = 0;
+    this.currentUser = null;
     this.timerInterval = null;
     this.startTime = null;
     this.isCompleted = false;
@@ -543,17 +544,14 @@ class Chess3x3 {
   }
 
   async saveUserScore() {
-    const currentUser = JSON.parse(localStorage.getItem('chessbrain_user'));
-    if (!currentUser) return;
+    // A identidade vem do cookie de sessão; o servidor ignora visitantes
+    if (!this.currentUser) return;
 
     try {
       await fetch('/api/score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: currentUser.username,
-          score: this.totalScore
-        })
+        body: JSON.stringify({ score: this.totalScore })
       });
       // Atualiza o ranking em tempo real
       this.fetchLeaderboard();
@@ -602,7 +600,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const authError = document.getElementById('auth-error');
 
   const updateUIForUser = () => {
-    const user = JSON.parse(localStorage.getItem('chessbrain_user'));
+    const user = game.currentUser;
     if (user) {
       userStatusEl.textContent = `Jogador: ${user.username}`;
       btnLoginModal.classList.add('hidden');
@@ -614,7 +612,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  // Restaura o usuário a partir do cookie de sessão
+  localStorage.removeItem('chessbrain_user'); // resquício da versão sem sessão
   updateUIForUser();
+  fetch('/api/me')
+    .then(res => res.json())
+    .then(data => {
+      game.currentUser = data.user || null;
+      updateUIForUser();
+    })
+    .catch(err => console.error('Erro ao carregar sessão:', err));
 
   btnLoginModal.addEventListener('click', () => {
     authError.textContent = '';
@@ -625,8 +632,13 @@ document.addEventListener('DOMContentLoaded', () => {
     modal.classList.add('hidden');
   });
 
-  btnLogout.addEventListener('click', () => {
-    localStorage.removeItem('chessbrain_user');
+  btnLogout.addEventListener('click', async () => {
+    try {
+      await fetch('/api/logout', { method: 'POST' });
+    } catch (err) {
+      console.error('Erro ao encerrar sessão:', err);
+    }
+    game.currentUser = null;
     updateUIForUser();
   });
 
@@ -648,7 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      localStorage.setItem('chessbrain_user', JSON.stringify(data.user));
+      game.currentUser = data.user;
       updateUIForUser();
       modal.classList.add('hidden');
       game.fetchLeaderboard();
@@ -675,7 +687,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      localStorage.setItem('chessbrain_user', JSON.stringify(data.user));
+      game.currentUser = data.user;
       updateUIForUser();
       modal.classList.add('hidden');
       game.fetchLeaderboard();
