@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Moldura de madeira -->
+  <rect width="64" height="64" rx="12" fill="#2b1b10"/>
+  <!-- Tabuleiro 3x3 -->
+  <g transform="translate(5 5)">
+    <rect width="54" height="54" rx="4" fill="#a2703f"/>
+    <path fill="#e6cc9f" d="M0 4a4 4 0 0 1 4-4h14v18H0zM36 0h14a4 4 0 0 1 4 4v14H36zM18 18h18v18H18zM0 36h18v18H4a4 4 0 0 1-4-4zM36 36h18v14a4 4 0 0 1-4 4H36z"/>
+  </g>
+  <!-- Peão dourado -->
+  <g fill="#d4a557" stroke="#1c120a" stroke-width="2.5" stroke-linejoin="round">
+    <path d="M32 12a7 7 0 0 1 4.6 12.3c2.6 1.6 4.4 4.3 4.4 7.7h-4.5c0 5 1.6 9.5 5 13.5H22.5c3.4-4 5-8.5 5-13.5H23c0-3.4 1.8-6.1 4.4-7.7A7 7 0 0 1 32 12z"/>
+    <rect x="17" y="45.5" width="30" height="7" rx="2.5"/>
+  </g>
+</svg>
