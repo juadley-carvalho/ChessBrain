@@ -37,7 +37,7 @@ ChessBrain/
 │   ├── script.js        # Motor do jogo (classe Chess3x3): regras, UI, timer, pontuação, autenticação
 │   └── challenges.js    # Gerador de desafios de movimentação + base de puzzles de mate
 ├── data/
-│   └── chessbrain.db    # Banco SQLite (criado automaticamente; fora do Git)
+│   └── chessbrain.db    # Banco SQLite (versionado no Git)
 ├── package.json
 └── docs/
     ├── MELHORIAS.md # Melhorias e problemas identificados

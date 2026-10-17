@@ -1,11 +1,11 @@
 # Dependências
 node_modules/
 
-# Banco de dados SQLite (dados reais de usuários)
-*.db
+# Banco de dados SQLite: data/chessbrain.db é versionado de propósito.
+# Ficam de fora só os arquivos temporários do SQLite.
 *.db-journal
-*.sqlite
-*.sqlite3
+*.db-wal
+*.db-shm
 
 # Variáveis de ambiente
 .env

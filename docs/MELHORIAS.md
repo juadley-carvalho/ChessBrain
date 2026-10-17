@@ -83,6 +83,8 @@ O repositório tem cerca de 1.800 arquivos versionados, a maioria de `node_modul
 
 > **Resolvido** no commit `6beef5c` (`.gitignore` + remoção do índice). O banco continua nos commits antigos (`b60c8ab`, `4d8c11c`); como o repositório é privado e os dados não são sensíveis, a limpeza do histórico não foi feita.
 
+> **Decisão posterior:** o banco (`data/chessbrain.db`) voltou a ser versionado de propósito, para manter os placares junto com o projeto. Só os arquivos temporários do SQLite (`-journal`, `-wal`, `-shm`) ficam no `.gitignore`.
+
 ---
 
 ## 🟠 Alta
