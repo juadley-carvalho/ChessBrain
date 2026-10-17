@@ -85,7 +85,7 @@ O tabuleiro usa notação algébrica reduzida, de `a1` a `c3`. Internamente ele 
   1   [2,0] [2,1] [2,2]
 ```
 
-Peças são representadas por letras: maiúsculas = brancas (`K Q R B N P`), minúsculas = pretas (`k q r b n p`).
+Peças são representadas por letras: maiúsculas = brancas (`K Q R B N P`), minúsculas = pretas (`k q r b n p`). O peão que chega à última linha vira Dama automaticamente.
 
 ### Pontuação
 
@@ -158,7 +158,7 @@ Regras importantes:
 - Como o jogo compara a sequência exata, cada lance da solução precisa ser o **único** que mantém o mate no número de lances restantes.
 - Cada resposta das pretas deve ser legal e a melhor defesa (a que adia o mate ao máximo).
 - Nenhum lance das brancas pode deixar as pretas afogadas antes do mate, porque o jogo detecta o afogamento e reinicia o desafio.
-- Sem peões, enquanto o jogo não tiver promoção.
+- Peões só podem começar na linha do meio. Ao chegar à última linha, o peão é promovido a Dama automaticamente.
 
 Para conferir tudo isso, rode o validador, que refaz a busca exaustiva de cada puzzle:
 

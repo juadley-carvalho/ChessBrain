@@ -23,7 +23,7 @@ _Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos e
 | 8  | Sem limite de tentativas de login e sem regras de senha              | Segurança   | 🟠 | Descartado |
 | 9  | Pontuação de login não é carregada; o placar recomeça em 0           | Jogo        | 🟡 | Concluído |
 | 10 | Mate validado só pela sequência exata, não por xeque‑mate real       | Jogo        | 🟡 | Aberto |
-| 11 | Sem promoção de peão                                                  | Jogo        | 🟡 | Aberto |
+| 11 | Sem promoção de peão                                                  | Jogo        | 🟡 | Concluído |
 | 12 | Desafio de movimentação pode gerar alvo trivial ou igual ao inicial  | Jogo        | 🟡 | Aberto |
 | 13 | Lógica de movimento duplicada entre `script.js` e `challenges.js`    | Código      | 🟡 | Concluído |
 | 14 | `bcrypt.hashSync`/`compareSync` bloqueiam o servidor                 | Back‑end    | 🟡 | Concluído |
@@ -153,6 +153,8 @@ O jogo compara os lances com `solution`. Se o jogador encontrar outro mate váli
 Um peão que chega à última linha continua peão e fica sem lances. Num tabuleiro de 3 linhas isso acontece logo no primeiro lance.
 
 **Proposta:** promover automaticamente para Dama ou oferecer a escolha da peça. Ajustar também o gerador de desafios, que hoje nunca move o peão porque `getRawMoves` não trata `p` ([challenges.js:114-151](../challenges.js#L114-L151)).
+
+> **Resolvido:** `ChessEngine.applyMove` promove automaticamente a Dama o peão que chega à última linha, para as duas cores, e o jogo mostra "Peão promovido a Dama!". Desde o item 13 o gerador de movimentação usa as mesmas regras, então o peão também se move (e é promovido) ao montar o alvo. O validador de puzzles passou a aceitar peões na linha do meio. O gerador de puzzles continua sem peões, porque as simetrias que ele usa para descartar posições repetidas não valem para peças com direção.
 
 ### 12. Desafio de movimentação pode gerar alvo trivial ou igual ao inicial
 **Onde:** [challenges.js:65-88](../challenges.js#L65-L88)

@@ -354,7 +354,9 @@ class Chess3x3 {
   }
 
   executeMove(from, to, isBlackMove = false) {
+    const promoted = ChessEngine.isPromotion(this.board[from.r][from.c], to.r);
     this.board = ChessEngine.applyMove(this.board, { from, to });
+    if (promoted) this.setFeedback('Peão promovido a Dama!');
 
     if (!isBlackMove) {
       this.moveHistory.push({ from, to });

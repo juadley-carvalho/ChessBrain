@@ -9,7 +9,7 @@
  *   node scripts/puzzles.js generate [max] [n] gera até [n] puzzles por nível, até mate em [max]
  *
  * Um puzzle é válido quando:
- *   - a posição inicial é legal (pretas fora de xeque, sem peões);
+ *   - a posição inicial é legal (pretas fora de xeque, peões só na linha do meio);
  *   - o mate mais rápido possível leva exatamente N lances;
  *   - em cada passo, o lance da solução é o ÚNICO que mantém o mate no número de
  *     lances restantes (o jogo compara a sequência exata);
@@ -89,7 +89,9 @@ function validatePuzzle(puzzle, expectedN) {
 
   if (n !== expectedN) errors.push(`solution tem ${n} lance(s), esperado ${expectedN}`);
   if (responses.length !== n - 1) errors.push(`blackResponses tem ${responses.length} lance(s), esperado ${n - 1}`);
-  if (board.flat().some(p => p && p.toLowerCase() === 'p')) errors.push('puzzles não devem ter peões (sem promoção no jogo)');
+  if ([0, 2].some(r => board[r].some(p => p && p.toLowerCase() === 'p'))) {
+    errors.push('peões não podem começar na primeira nem na última linha');
+  }
   if (board.flat().filter(p => p === 'K').length !== 1 || board.flat().filter(p => p === 'k').length !== 1) {
     errors.push('a posição precisa de exatamente um rei de cada cor');
   }
@@ -173,7 +175,7 @@ function check() {
 // Geração
 // ==========================================
 
-// As 8 simetrias do quadrado; sem peões, todas preservam as regras
+// As 8 simetrias do quadrado; sem peões, todas preservam as regras (por isso o gerador não usa peões)
 const SYMMETRIES = [
   (r, c) => [r, c], (r, c) => [r, 2 - c], (r, c) => [2 - r, c], (r, c) => [2 - r, 2 - c],
   (r, c) => [c, r], (r, c) => [c, 2 - r], (r, c) => [2 - c, r], (r, c) => [2 - c, 2 - r]

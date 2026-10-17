@@ -97,10 +97,15 @@ const ChessEngine = (() => {
     return false;
   }
 
-  // Devolve um novo tabuleiro com o lance aplicado
+  // Peão que chega à última linha (a3–c3 para as brancas, a1–c1 para as pretas)
+  const isPromotion = (piece, toRow) =>
+    piece === 'P' ? toRow === 0 : piece === 'p' ? toRow === 2 : false;
+
+  // Devolve um novo tabuleiro com o lance aplicado; o peão é promovido a Dama automaticamente
   function applyMove(board, move) {
     const next = cloneBoard(board);
-    next[move.to.r][move.to.c] = next[move.from.r][move.from.c];
+    const piece = next[move.from.r][move.from.c];
+    next[move.to.r][move.to.c] = isPromotion(piece, move.to.r) ? (isWhitePiece(piece) ? 'Q' : 'q') : piece;
     next[move.from.r][move.from.c] = null;
     return next;
   }
@@ -139,6 +144,7 @@ const ChessEngine = (() => {
     rawMoves,
     hasKing,
     isKingInCheck,
+    isPromotion,
     applyMove,
     legalMovesFrom,
     legalMoves,
