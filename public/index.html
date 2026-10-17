@@ -68,7 +68,9 @@
       <!-- Área Central do Jogo: Tabuleiro Principal + Miniatura Objetivo -->
       <div class="game-play-area">
         <div class="board-wrapper">
-          <div class="board-label">Tabuleiro Atual</div>
+          <div id="board-label" class="board-label">Tabuleiro Atual</div>
+          <!-- Nos desafios de mate: melhor pontuação do jogador neste jogo -->
+          <div id="board-best" class="board-best hidden"></div>
           <div id="board" class="board-3x3" role="group" aria-label="Tabuleiro atual (setas para navegar, Enter para selecionar e mover)"></div>
         </div>
 

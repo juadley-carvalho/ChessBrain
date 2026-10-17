@@ -147,7 +147,8 @@ Todas as rotas recebem e devolvem JSON. Login e cadastro criam uma sessão guard
 | POST   | `/api/login`       | `{ "username", "password" }`           | Autentica e abre a sessão. Retorna `{ success, user: { id, username, score } }`. |
 | GET    | `/api/me`          | —                                      | Retorna o usuário da sessão: `{ user }` (ou `{ user: null }`).    |
 | POST   | `/api/logout`      | —                                      | Encerra a sessão.                                                 |
-| POST   | `/api/score`       | `{ "points" }`                         | **Exige sessão.** Soma os pontos de um desafio (inteiro de 1 a 1.000) ao total do usuário logado. Retorna `{ success, score }`. |
+| POST   | `/api/score`       | `{ "points", "puzzleId"? }`            | **Exige sessão.** Soma os pontos de um desafio (inteiro de 1 a 1.000) ao total do usuário logado. Com `puzzleId` (desafios de mate), guarda também a melhor pontuação naquele jogo. Retorna `{ success, score, best? }`. |
+| GET    | `/api/puzzle-best` | —                                      | **Exige sessão.** Melhor pontuação do usuário em cada jogo de mate: `{ "214": 323, ... }`. |
 | GET    | `/api/leaderboard` | —                                      | Retorna os 10 melhores: `[{ username, score }]`.                  |
 
 Erros retornam `{ "error": "mensagem" }` com status `400`, `401` ou `500`.

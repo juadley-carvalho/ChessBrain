@@ -90,3 +90,23 @@ test('pontuação exige sessão e valores válidos', async () => {
     assert.equal((await post('/api/score', { points }, cookie)).status, 400, `points = ${points}`);
   }
 });
+
+test('guarda a melhor pontuação de cada puzzle de mate', async () => {
+  const res = await post('/api/register', { username: 'teste_best', password: 'x' });
+  const cookie = res.headers.get('set-cookie').split(';')[0];
+
+  assert.equal((await fetch(`${BASE}/api/puzzle-best`)).status, 401);
+
+  const first = await (await post('/api/score', { points: 300, puzzleId: 214 }, cookie)).json();
+  const worse = await (await post('/api/score', { points: 200, puzzleId: 214 }, cookie)).json();
+  const better = await (await post('/api/score', { points: 450, puzzleId: 101 }, cookie)).json();
+  assert.equal(first.best, 300);
+  assert.equal(worse.best, 300);
+  assert.equal(worse.score, 500);
+  assert.equal(better.best, 450);
+
+  const best = await (await fetch(`${BASE}/api/puzzle-best`, { headers: { Cookie: cookie } })).json();
+  assert.deepEqual(best, { 101: 450, 214: 300 });
+
+  assert.equal((await post('/api/score', { points: 100, puzzleId: 'x' }, cookie)).status, 400);
+});

@@ -26,6 +26,8 @@ const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 dias
 const USERNAME_REGEX = /^[A-Za-z0-9_.-]{3,20}$/;
 // Pontos de um único desafio (o jogo dá de 100 a 1000)
 const MAX_POINTS_PER_CHALLENGE = 1000;
+// IDs dos puzzles de mate (101, 214...) definidos em public/challenges.js
+const MAX_PUZZLE_ID = 99999;
 
 // Middlewares para aceitar dados JSON nas requisições
 app.use(express.json({ limit: '10kb' }));
@@ -75,6 +77,16 @@ function initDatabase(onReady) {
         token TEXT PRIMARY KEY,
         user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         expires_at INTEGER NOT NULL
+      )
+    `);
+
+    // Melhor pontuação de cada jogador em cada puzzle de mate
+    db.run(`
+      CREATE TABLE IF NOT EXISTS puzzle_best (
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        puzzle_id INTEGER NOT NULL,
+        best INTEGER NOT NULL,
+        PRIMARY KEY (user_id, puzzle_id)
       )
     `);
 
@@ -256,12 +268,16 @@ app.post('/api/logout', (req, res) => {
   });
 });
 
-// Rota 5: Soma os pontos de um desafio concluído ao total do jogador logado
+// Rota 5: Soma os pontos de um desafio concluído ao total do jogador logado.
+// Com puzzleId (desafios de mate), também guarda a melhor pontuação naquele puzzle.
 app.post('/api/score', requireAuth, (req, res) => {
-  const { points } = req.body;
+  const { points, puzzleId } = req.body;
 
   if (!Number.isInteger(points) || points < 1 || points > MAX_POINTS_PER_CHALLENGE) {
     return res.status(400).json({ error: 'Pontuação inválida.' });
+  }
+  if (puzzleId !== undefined && (!Number.isInteger(puzzleId) || puzzleId < 1 || puzzleId > MAX_PUZZLE_ID)) {
+    return res.status(400).json({ error: 'Puzzle inválido.' });
   }
 
   // A pontuação é acumulada: cada desafio soma ao total salvo
@@ -274,8 +290,40 @@ app.post('/api/score', requireAuth, (req, res) => {
       if (selectErr || !row) {
         return res.status(500).json({ error: 'Erro ao ler pontuação.' });
       }
-      res.json({ success: true, score: row.score });
+      if (puzzleId === undefined) return res.json({ success: true, score: row.score });
+
+      const upsert = `
+        INSERT INTO puzzle_best (user_id, puzzle_id, best) VALUES (?, ?, ?)
+        ON CONFLICT (user_id, puzzle_id) DO UPDATE SET best = MAX(best, excluded.best)
+      `;
+      db.run(upsert, [req.user.id, puzzleId, points], upsertErr => {
+        if (upsertErr) {
+          return res.status(500).json({ error: 'Erro ao salvar melhor pontuação.' });
+        }
+        db.get(
+          `SELECT best FROM puzzle_best WHERE user_id = ? AND puzzle_id = ?`,
+          [req.user.id, puzzleId],
+          (bestErr, bestRow) => {
+            if (bestErr || !bestRow) {
+              return res.status(500).json({ error: 'Erro ao ler melhor pontuação.' });
+            }
+            res.json({ success: true, score: row.score, best: bestRow.best });
+          }
+        );
+      });
     });
+  });
+});
+
+// Rota 5b: Melhor pontuação do jogador logado em cada puzzle de mate ({ "214": 323, ... })
+app.get('/api/puzzle-best', requireAuth, (req, res) => {
+  db.all(`SELECT puzzle_id, best FROM puzzle_best WHERE user_id = ?`, [req.user.id], (err, rows) => {
+    if (err) return res.status(500).json({ error: 'Erro ao buscar melhores pontuações.' });
+    const best = {};
+    rows.forEach(r => {
+      best[r.puzzle_id] = r.best;
+    });
+    res.json(best);
   });
 });
 

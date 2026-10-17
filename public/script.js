@@ -24,6 +24,8 @@ class Chess3x3 {
     // Pontos desde que a página foi aberta; o total salvo fica em currentUser.score
     this.sessionScore = 0;
     this.currentUser = null;
+    // Melhor pontuação em cada puzzle de mate ({ 214: 323 }); vem do servidor para quem está logado
+    this.puzzleBest = {};
     this.timerInterval = null;
     this.startTime = null;
     this.isCompleted = false;
@@ -198,6 +200,7 @@ class Chess3x3 {
 
     document.getElementById('challenge-title').textContent = challenge.title;
     document.getElementById('challenge-desc').textContent = challenge.description;
+    this.renderBoardLabel();
     this.setFeedback('');
 
     // Exibe ou esconde a miniatura do objetivo
@@ -212,6 +215,22 @@ class Chess3x3 {
     this.clearSelection();
     this.startTimer(keepTimer);
     this.render();
+  }
+
+  // Nos desafios de mate mostra o número do puzzle e a melhor pontuação nele, para reconhecer repetidos
+  renderBoardLabel() {
+    const challenge = this.currentChallenge;
+    const labelEl = document.getElementById('board-label');
+    const bestEl = document.getElementById('board-best');
+    if (!challenge || challenge.type !== 'mate') {
+      labelEl.textContent = 'Tabuleiro Atual';
+      bestEl.classList.add('hidden');
+      return;
+    }
+    labelEl.textContent = `Jogo #${challenge.id}`;
+    const best = this.puzzleBest[challenge.id];
+    bestEl.textContent = best ? `Seu recorde: ${best.toLocaleString('pt-BR')} pts` : 'Ainda não resolvido';
+    bestEl.classList.remove('hidden');
   }
 
   // Renderiza as peças no mini-tabuleiro de objetivo
@@ -521,12 +540,21 @@ class Chess3x3 {
     this.sessionScore += pointsGained;
     this.renderScores();
 
+    const isMate = this.currentChallenge.type === 'mate';
+    const puzzleId = isMate ? this.currentChallenge.id : undefined;
+    const previousBest = isMate ? this.puzzleBest[puzzleId] : undefined;
+    const recordHint = previousBest && pointsGained > previousBest ? ' Novo recorde neste jogo!' : '';
+    if (isMate && !(previousBest >= pointsGained)) {
+      this.puzzleBest[puzzleId] = pointsGained;
+      this.renderBoardLabel();
+    }
+
     const saveHint = this.currentUser ? '' : ' (entre para salvar no ranking)';
     const mistakesHint = this.mistakes ? ` (${this.mistakes} ${this.mistakes === 1 ? 'erro' : 'erros'})` : '';
-    this.setFeedback(`Desafio Concluído! +${pointsGained} pontos${mistakesHint}${saveHint}`, 'success');
+    this.setFeedback(`Desafio Concluído! +${pointsGained} pontos${mistakesHint}${saveHint}${recordHint}`, 'success');
 
     // Soma os pontos ao total da conta caso o jogador esteja logado
-    this.saveUserScore(pointsGained);
+    this.saveUserScore(pointsGained, puzzleId);
   }
 
   renderScores() {
@@ -544,9 +572,8 @@ class Chess3x3 {
       return;
     }
     const full = value.toLocaleString('pt-BR');
-    el.textContent = value < 100000
-      ? full
-      : value.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 });
+    el.textContent =
+      value < 100000 ? full : value.toLocaleString('pt-BR', { notation: 'compact', maximumFractionDigits: 1 });
     el.title = `${full} pontos`;
     this.fitValue(el);
   }
@@ -565,7 +592,7 @@ class Chess3x3 {
     return ChessEngine.legalMovesFrom(this.board, r, c);
   }
 
-  async saveUserScore(points) {
+  async saveUserScore(points, puzzleId) {
     // A identidade vem do cookie de sessão; o servidor ignora visitantes
     if (!this.currentUser) return;
 
@@ -573,18 +600,36 @@ class Chess3x3 {
       const res = await fetch('api/score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ points })
+        body: JSON.stringify({ points, puzzleId })
       });
       const data = await res.json();
       if (res.ok && this.currentUser) {
         this.currentUser.score = data.score;
         this.renderScores();
+        if (puzzleId !== undefined && data.best) {
+          this.puzzleBest[puzzleId] = data.best;
+          this.renderBoardLabel();
+        }
       }
       // Atualiza o ranking em tempo real
       this.fetchLeaderboard();
     } catch (err) {
       console.error('Erro ao salvar pontuação:', err);
     }
+  }
+
+  // Carrega as melhores pontuações do jogador logado; visitantes só guardam as desta visita
+  async fetchPuzzleBest() {
+    this.puzzleBest = {};
+    if (this.currentUser) {
+      try {
+        const res = await fetch('api/puzzle-best');
+        if (res.ok) this.puzzleBest = await res.json();
+      } catch (err) {
+        console.error('Erro ao carregar melhores pontuações:', err);
+      }
+    }
+    this.renderBoardLabel();
   }
 
   // Carrega o Ranking Geral do Servidor
@@ -659,6 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(data => {
       game.currentUser = data.user || null;
       updateUIForUser();
+      game.fetchPuzzleBest();
     })
     .catch(err => console.error('Erro ao carregar sessão:', err));
 
@@ -699,6 +745,7 @@ document.addEventListener('DOMContentLoaded', () => {
     game.currentUser = null;
     game.sessionScore = 0;
     updateUIForUser();
+    game.fetchPuzzleBest();
   });
 
   // Login e cadastro: mesma requisição, só muda a rota
@@ -724,6 +771,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       game.currentUser = data.user;
       updateUIForUser();
+      game.fetchPuzzleBest();
       closeModal();
       game.fetchLeaderboard();
     } catch (err) {

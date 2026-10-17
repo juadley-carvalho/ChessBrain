@@ -318,6 +318,13 @@ h3,
   margin-bottom: 10px;
 }
 
+.board-best {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: -6px 0 10px;
+}
+
 /* Moldura do tabuleiro em madeira envernizada */
 .board-wrapper {
   background: linear-gradient(180deg, rgba(255, 210, 150, 0.12), rgba(0, 0, 0, 0.3)), var(--grain), #4a2c17;
