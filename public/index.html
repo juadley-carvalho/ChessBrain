@@ -104,20 +104,21 @@
 
   <!-- Modal de Autenticação (Login / Cadastro) -->
   <div id="auth-modal" class="modal-backdrop hidden">
-    <div class="modal-card">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <h3 id="modal-title">Entrar no ChessBrain</h3>
       <form id="auth-form">
         <div class="input-group">
           <label for="auth-username">Usuário:</label>
-          <input type="text" id="auth-username" required autocomplete="off">
+          <input type="text" id="auth-username" required autocomplete="username">
         </div>
         <div class="input-group">
           <label for="auth-password">Senha:</label>
-          <input type="password" id="auth-password" required>
+          <input type="password" id="auth-password" required autocomplete="current-password">
         </div>
-        <div id="auth-error" class="modal-error"></div>
+        <div id="auth-error" class="modal-error" role="alert"></div>
         <div class="modal-buttons">
-          <button type="button" id="btn-submit-login" class="btn-primary">Entrar</button>
+          <!-- Enter envia o formulário como login -->
+          <button type="submit" id="btn-submit-login" class="btn-primary">Entrar</button>
           <button type="button" id="btn-submit-register" class="btn-secondary">Cadastrar</button>
         </div>
         <button type="button" id="btn-close-modal" class="btn-link">Cancelar</button>

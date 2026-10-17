@@ -527,13 +527,32 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .catch(err => console.error('Erro ao carregar sessão:', err));
 
-  btnLoginModal.addEventListener('click', () => {
+  const authForm = document.getElementById('auth-form');
+  const usernameInput = document.getElementById('auth-username');
+  const passwordInput = document.getElementById('auth-password');
+  const submitButtons = authForm.querySelectorAll('.modal-buttons button');
+
+  const openModal = () => {
     authError.textContent = '';
     modal.classList.remove('hidden');
-  });
+    usernameInput.focus();
+  };
 
-  document.getElementById('btn-close-modal').addEventListener('click', () => {
+  const closeModal = () => {
     modal.classList.add('hidden');
+    passwordInput.value = '';
+    (game.currentUser ? btnLogout : btnLoginModal).focus();
+  };
+
+  btnLoginModal.addEventListener('click', openModal);
+  document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+
+  // Fecha com clique fora do cartão ou com Esc
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
   });
 
   btnLogout.addEventListener('click', async () => {
@@ -547,16 +566,17 @@ document.addEventListener('DOMContentLoaded', () => {
     updateUIForUser();
   });
 
-  // Ação de Login
-  document.getElementById('btn-submit-login').addEventListener('click', async () => {
-    const username = document.getElementById('auth-username').value;
-    const password = document.getElementById('auth-password').value;
+  // Login e cadastro: mesma requisição, só muda a rota
+  const authenticate = async (endpoint) => {
+    if (!authForm.reportValidity()) return;
+    authError.textContent = '';
+    submitButtons.forEach(btn => { btn.disabled = true; });
 
     try {
-      const res = await fetch('api/login', {
+      const res = await fetch(`api/${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ username: usernameInput.value, password: passwordInput.value })
       });
       const data = await res.json();
 
@@ -567,39 +587,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
       game.currentUser = data.user;
       updateUIForUser();
-      modal.classList.add('hidden');
+      closeModal();
       game.fetchLeaderboard();
     } catch (err) {
       authError.textContent = 'Erro ao conectar ao servidor.';
+    } finally {
+      submitButtons.forEach(btn => { btn.disabled = false; });
     }
+  };
+
+  // Enter no formulário (ou o botão "Entrar") faz login
+  authForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    authenticate('login');
   });
-
-  // Ação de Cadastro
-  document.getElementById('btn-submit-register').addEventListener('click', async () => {
-    const username = document.getElementById('auth-username').value;
-    const password = document.getElementById('auth-password').value;
-
-    try {
-      const res = await fetch('api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        authError.textContent = data.error;
-        return;
-      }
-
-      game.currentUser = data.user;
-      updateUIForUser();
-      modal.classList.add('hidden');
-      game.fetchLeaderboard();
-    } catch (err) {
-      authError.textContent = 'Erro ao conectar ao servidor.';
-    }
-  });
+  document.getElementById('btn-submit-register').addEventListener('click', () => authenticate('register'));
 
   document.getElementById('btn-reset').addEventListener('click', () => {
     game.loadChallenge(game.currentChallenge);

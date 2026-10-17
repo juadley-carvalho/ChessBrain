@@ -28,7 +28,7 @@ _Última revisão: 2026-10-17 (base: commit `4d8c11c`, v0.5.0; itens críticos e
 | 13 | Lógica de movimento duplicada entre `script.js` e `challenges.js`    | Código      | 🟡 | Concluído |
 | 14 | `bcrypt.hashSync`/`compareSync` bloqueiam o servidor                 | Back‑end    | 🟡 | Concluído |
 | 15 | Servidor sobe mesmo se o banco falhar ao abrir                       | Back‑end    | 🟡 | Concluído |
-| 16 | Modal de login não envia com Enter                                    | UX          | 🟢 | Aberto |
+| 16 | Modal de login não envia com Enter                                    | UX          | 🟢 | Concluído |
 | 17 | Sem testes automatizados, lint ou formatação                         | Qualidade   | 🟢 | Aberto |
 | 18 | Organização de pastas e pequenas inconsistências                     | Código      | 🟢 | Aberto |
 | 19 | Acessibilidade do tabuleiro                                          | UX          | 🟢 | Aberto |
@@ -204,6 +204,8 @@ Se o SQLite não abrir, o erro só vai para o log e o servidor continua aceitand
 Os botões são `type="button"`, então Enter não faz nada. O modal também não fecha com Esc nem com clique fora, e o código de login e cadastro está duplicado.
 
 **Proposta:** tratar o evento `submit` do formulário e extrair uma função `authenticate(endpoint)`.
+
+> **Resolvido:** o botão "Entrar" virou `type="submit"` e o evento `submit` do formulário faz o login, então Enter funciona. Login e cadastro usam a mesma função `authenticate(endpoint)`, que desativa os botões durante a requisição. O modal fecha com Esc, com clique fora do cartão e com "Cancelar", foca o campo de usuário ao abrir, limpa a senha ao fechar e devolve o foco ao botão de origem. O cartão ganhou `role="dialog"`, e os campos, `autocomplete` para o gerenciador de senhas.
 
 ### 17. Sem testes automatizados, lint ou formatação
 Nada impede regressões nas regras de xadrez nem puzzles inválidos (item 5).
