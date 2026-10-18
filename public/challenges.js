@@ -6,8 +6,8 @@
 
 /* exported ChallengeGenerator */
 class ChallengeGenerator {
-  // Contador dos desafios de movimentação gerados (Date.now() podia repetir o ID)
-  static moveChallengeCount = 0;
+  // Faixa dos números de jogo (sementes) do desafio de movimentação
+  static MAX_MOVE_SEED = 99999;
 
   // Regras de pontuação por tipo de desafio (ver README, seção Pontuação).
   // No mate, perLevel soma pontos a cada jogada além da primeira (mate em 1 = 400, mate em 7 = 1000).
@@ -34,21 +34,24 @@ class ChallengeGenerator {
    * Usa no máximo 1 peça de cada tipo (Peão, Torre, Bispo, Cavalo, Rei, Dama) e escolhe
    * um alvo que exige exatamente entre minMoves e maxMoves lances (distância mínima via BFS).
    * Não há promoção: o alvo tem sempre as mesmas peças da posição inicial.
+   * Todo sorteio sai da semente (o "número do jogo"): a mesma semente gera sempre o mesmo desafio.
    */
-  static generateRandomMoveChallenge({ numPieces = 6, minMoves = 4, maxMoves = 6 } = {}) {
-    const pieces = this.shuffle(['P', 'R', 'B', 'N', 'K', 'Q']).slice(0, Math.min(numPieces, 6));
+  static generateRandomMoveChallenge({ numPieces = 6, minMoves = 4, maxMoves = 6, seed } = {}) {
+    if (seed === undefined) seed = 1 + Math.floor(Math.random() * this.MAX_MOVE_SEED);
+    const random = this.seededRandom(seed);
+    const pieces = this.shuffle(['P', 'R', 'B', 'N', 'K', 'Q'], random).slice(0, Math.min(numPieces, 6));
 
     for (let attempt = 0; attempt < 20; attempt++) {
-      const initialBoard = this.randomPlacement(pieces);
+      const initialBoard = this.randomPlacement(pieces, random);
       const levels = this.positionsByDistance(initialBoard, maxMoves);
 
       // Distância sorteada na faixa pedida; sem posições nela, usa a mais distante alcançável
-      const wanted = minMoves + Math.floor(Math.random() * (maxMoves - minMoves + 1));
+      const wanted = minMoves + Math.floor(random() * (maxMoves - minMoves + 1));
       const distance = Math.min(wanted, levels.length - 1);
       if (distance < minMoves) continue; // posição travada demais: sorteia outra
 
       const candidates = levels[distance];
-      const targetBoard = candidates[Math.floor(Math.random() * candidates.length)];
+      const targetBoard = candidates[Math.floor(random() * candidates.length)];
 
       // Notação algébrica das peças no tabuleiro final (ex: Ra3, Bc1)
       const targetNotations = [];
@@ -59,7 +62,8 @@ class ChallengeGenerator {
       }
 
       return {
-        id: `move-${++this.moveChallengeCount}`,
+        id: `move-${seed}`,
+        seed,
         title: `Desafio de Movimentação (Aleatório)`,
         type: 'move',
         description: `Posicione as peças em: ${targetNotations.join(', ')} — mínimo de ${distance} lances`,
@@ -71,11 +75,23 @@ class ChallengeGenerator {
     throw new Error('Não foi possível gerar um desafio de movimentação.');
   }
 
+  // Gerador pseudoaleatório com semente (mulberry32): mesma semente, mesma sequência em [0, 1)
+  static seededRandom(seed) {
+    let state = seed >>> 0;
+    return () => {
+      state = (state + 0x6d2b79f5) >>> 0;
+      let t = state;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
   // Embaralhamento de Fisher–Yates (sem o viés do sort aleatório)
-  static shuffle(items) {
+  static shuffle(items, random = Math.random) {
     const result = [...items];
     for (let i = result.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = Math.floor(random() * (i + 1));
       [result[i], result[j]] = [result[j], result[i]];
     }
     return result;
@@ -121,7 +137,7 @@ class ChallengeGenerator {
 
   // Coloca as peças em casas aleatórias; o peão começa na primeira linha (a1–c1),
   // de onde tem um lance sem promover
-  static randomPlacement(pieces) {
+  static randomPlacement(pieces, random = Math.random) {
     const board = Array(3)
       .fill(null)
       .map(() => Array(3).fill(null));
@@ -134,7 +150,7 @@ class ChallengeGenerator {
     const ordered = [...pieces].sort((a, b) => (b === 'P') - (a === 'P'));
     ordered.forEach(piece => {
       const options = piece === 'P' ? free.filter(pos => pos.r === 2) : free;
-      const pos = options[Math.floor(Math.random() * options.length)];
+      const pos = options[Math.floor(random() * options.length)];
       free.splice(free.indexOf(pos), 1);
       board[pos.r][pos.c] = piece;
     });

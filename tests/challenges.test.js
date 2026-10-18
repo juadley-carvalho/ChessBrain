@@ -60,6 +60,20 @@ test('desafios de movimentação têm IDs diferentes', () => {
   assert.notEqual(a.id, b.id);
 });
 
+test('a mesma semente gera o mesmo desafio de movimentação', () => {
+  const a = ChallengeGenerator.generateRandomMoveChallenge({ seed: 4821 });
+  const b = ChallengeGenerator.generateRandomMoveChallenge({ seed: 4821 });
+  assert.deepEqual(a, b);
+  assert.equal(a.seed, 4821);
+  assert.equal(a.id, 'move-4821');
+
+  const c = ChallengeGenerator.generateRandomMoveChallenge({ seed: 4822 });
+  assert.notDeepEqual(c.initialBoard, a.initialBoard);
+
+  const random = ChallengeGenerator.generateRandomMoveChallenge();
+  assert.ok(Number.isInteger(random.seed) && random.seed >= 1 && random.seed <= ChallengeGenerator.MAX_MOVE_SEED);
+});
+
 test('movimentação vale menos que mate e perde pontos só por erro', () => {
   const move = { type: 'move' };
   assert.equal(ChallengeGenerator.points(move, 0, 0), 300);
