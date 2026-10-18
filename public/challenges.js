@@ -169,13 +169,26 @@ class ChallengeGenerator {
     return levels;
   }
 
-  // Sorteia um puzzle do nível, evitando repetir o atual quando houver alternativa
-  static getMateChallenge(mateInX, currentId = null) {
+  /**
+   * Próximo puzzle do nível: o primeiro ainda não resolvido depois do atual, na ordem da base
+   * (dando a volta). Com o nível todo resolvido, sorteia um diferente do atual quando houver.
+   */
+  static getMateChallenge(mateInX, currentId = null, solvedIds = new Set()) {
     const database = MATE_PUZZLES_DATABASE[mateInX];
     if (!database || database.length === 0) return null;
 
+    const start = database.findIndex(p => p.id === currentId) + 1;
+    const ordered = [...database.slice(start), ...database.slice(0, start)];
+    const unsolved = ordered.filter(p => !solvedIds.has(p.id));
+    if (unsolved.length > 0) return unsolved.find(p => p.id !== currentId) || unsolved[0];
+
     const options = database.length > 1 ? database.filter(p => p.id !== currentId) : database;
     return options[Math.floor(Math.random() * options.length)];
+  }
+
+  // Puzzles do nível em ordem (para a barra de progresso)
+  static getMatePuzzles(mateInX) {
+    return MATE_PUZZLES_DATABASE[mateInX] || [];
   }
 
   // Níveis de mate com pelo menos um puzzle, em ordem crescente

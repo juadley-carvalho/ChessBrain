@@ -28,6 +28,19 @@ test('getMateChallenge evita repetir o puzzle atual', () => {
   assert.equal(ChallengeGenerator.getMateChallenge(99), null);
 });
 
+test('getMateChallenge segue para o próximo puzzle não resolvido', () => {
+  const ids = MATE_PUZZLES_DATABASE[1].map(p => p.id);
+  assert.equal(ChallengeGenerator.getMateChallenge(1).id, ids[0]);
+  assert.equal(ChallengeGenerator.getMateChallenge(1, ids[0]).id, ids[1]);
+  // Pula os resolvidos e dá a volta na lista
+  const solved = new Set([ids[0], ids[2]]);
+  assert.equal(ChallengeGenerator.getMateChallenge(1, ids[1], solved).id, ids[3]);
+  const allButFirst = new Set(ids.slice(1));
+  assert.equal(ChallengeGenerator.getMateChallenge(1, ids[3], allButFirst).id, ids[0]);
+  // Só falta o atual: continua nele
+  assert.equal(ChallengeGenerator.getMateChallenge(1, ids[0], allButFirst).id, ids[0]);
+});
+
 test('desafio de movimentação respeita a distância mínima pedida', () => {
   for (let i = 0; i < 10; i++) {
     const challenge = ChallengeGenerator.generateRandomMoveChallenge({ minMoves: 4, maxMoves: 6 });

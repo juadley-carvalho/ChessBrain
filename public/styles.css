@@ -169,7 +169,7 @@ h3,
 }
 
 .ranking-card li::before {
-  content: counter(rank) ".";
+  content: counter(rank) '.';
   min-width: 1.4em;
   color: var(--gold);
   font-weight: 700;
@@ -335,6 +335,41 @@ h3,
   text-transform: uppercase;
   color: var(--gold);
   margin-bottom: 10px;
+}
+
+.mate-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 12px;
+}
+
+.progress-bar {
+  display: flex;
+  gap: 4px;
+  width: min(100%, 260px);
+}
+
+.progress-segment {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--wood-medium);
+}
+
+.progress-segment.solved {
+  background: var(--gold);
+}
+
+.progress-segment.current {
+  outline: 2px solid var(--text-muted);
+  outline-offset: 1px;
+}
+
+.progress-text {
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
 
 .board-best {
