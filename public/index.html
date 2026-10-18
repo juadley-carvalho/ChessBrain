@@ -46,6 +46,28 @@
           </select>
         </div>
 
+        <!-- Na movimentação: mostra o número do jogo atual e abre outro pelo número
+             (a mesma semente gera o mesmo desafio) -->
+        <form id="seed-form" class="seed-form hidden">
+          <label for="input-seed">Jogo #</label>
+          <input
+            id="input-seed"
+            class="seed-input"
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxlength="5"
+            autocomplete="off"
+            required
+          />
+          <button type="submit" class="btn-secondary btn-icon" aria-label="Buscar jogo" title="Buscar jogo">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <circle cx="10.5" cy="10.5" r="6.5" />
+              <line x1="15.5" y1="15.5" x2="21" y2="21" />
+            </svg>
+          </button>
+        </form>
+
         <h2 id="challenge-title">Desafio #1</h2>
         <p id="challenge-desc">Carregando desafio...</p>
 

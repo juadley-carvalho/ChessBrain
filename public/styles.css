@@ -238,6 +238,38 @@ h3,
   outline: none;
 }
 
+.seed-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: -6px 0 14px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.seed-input {
+  width: 6.5em;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  background: #24160c;
+  color: var(--text-color);
+  border: 1px solid #000;
+  box-shadow: 0 0 0 1px rgba(212, 165, 87, 0.3) inset;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+.seed-input:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 1px var(--gold) inset;
+}
+
+.seed-form .btn-icon {
+  display: inline-flex;
+  padding: 6px 9px;
+}
+
 .mode-select option {
   background: var(--wood-dark);
 }

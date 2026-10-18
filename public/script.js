@@ -138,6 +138,21 @@ class Chess3x3 {
         this.generateNextChallenge();
       });
     }
+
+    // Campo "Jogo #": mostra o número atual; ao buscar, recria o desafio de movimentação daquele número
+    const seedForm = document.getElementById('seed-form');
+    const seedInput = document.getElementById('input-seed');
+    seedInput.maxLength = String(ChallengeGenerator.MAX_MOVE_SEED).length;
+    // Campo de texto (sem as setas do type="number"), mas só aceita dígitos
+    seedInput.addEventListener('input', () => {
+      seedInput.value = seedInput.value.replace(/\D/g, '');
+    });
+    seedForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const seed = Number(seedInput.value);
+      if (!Number.isInteger(seed) || seed < 1 || seed > ChallengeGenerator.MAX_MOVE_SEED) return;
+      this.generateNextChallenge({ seed });
+    });
   }
 
   // Explica a pontuação no quadro abaixo do ranking, com os valores de ChallengeGenerator.SCORING
@@ -168,9 +183,10 @@ class Chess3x3 {
     });
   }
 
-  generateNextChallenge() {
+  // Com seed, gera aquele jogo de movimentação em vez de um sorteado
+  generateNextChallenge({ seed } = {}) {
     const selectEl = document.getElementById('select-mode');
-    const selectedMode = selectEl ? selectEl.value : 'move';
+    const selectedMode = seed !== undefined || !selectEl ? 'move' : selectEl.value;
 
     let challenge = null;
     if (selectedMode.startsWith('mate-')) {
@@ -178,7 +194,7 @@ class Chess3x3 {
       const currentId = this.currentChallenge ? this.currentChallenge.id : null;
       challenge = ChallengeGenerator.getMateChallenge(mateInX, currentId, this.solvedIds());
     }
-    this.currentChallenge = challenge || ChallengeGenerator.generateRandomMoveChallenge();
+    this.currentChallenge = challenge || ChallengeGenerator.generateRandomMoveChallenge({ seed });
     this.mistakes = 0;
     this.pointsAwarded = false;
 
@@ -261,6 +277,8 @@ class Chess3x3 {
     document.getElementById('challenge-desc').textContent = challenge.description;
     this.renderBoardLabel();
     this.setFeedback('');
+    document.getElementById('seed-form').classList.toggle('hidden', challenge.type !== 'move');
+    if (challenge.seed) document.getElementById('input-seed').value = challenge.seed;
 
     // Exibe ou esconde a miniatura do objetivo
     const targetWrapper = document.getElementById('target-board-wrapper');
@@ -276,14 +294,15 @@ class Chess3x3 {
     this.render();
   }
 
-  // Nos desafios de mate mostra o número do puzzle e a melhor pontuação nele, para reconhecer repetidos
+  // Mostra o número do jogo (puzzle de mate ou semente da movimentação); no mate, também
+  // a melhor pontuação nele, para reconhecer repetidos
   renderBoardLabel() {
     this.renderMateProgress();
     const challenge = this.currentChallenge;
     const labelEl = document.getElementById('board-label');
     const bestEl = document.getElementById('board-best');
     if (!challenge || challenge.type !== 'mate') {
-      labelEl.textContent = 'Tabuleiro Atual';
+      labelEl.textContent = challenge && challenge.seed ? `Jogo #${challenge.seed}` : 'Tabuleiro Atual';
       bestEl.classList.add('hidden');
       return;
     }
