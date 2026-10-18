@@ -124,20 +124,38 @@ class Chess3x3 {
   }
 
   initModeSelector() {
-    const selectEl = document.getElementById('select-mode');
-    if (selectEl) {
-      // Só oferece os níveis de mate que têm puzzles cadastrados
-      ChallengeGenerator.getMateLevels().forEach(n => {
-        const option = document.createElement('option');
-        option.value = `mate-${n}`;
-        option.textContent = `Mate em ${n} ${n === 1 ? 'Jogada' : 'Jogadas'}`;
-        selectEl.appendChild(option);
-      });
+    // Volta ao último modo e nível usados; nível que não existe mais cai no primeiro
+    const levels = ChallengeGenerator.getMateLevels();
+    const saved = this.loadSavedMode();
+    this.mode = saved.mode === 'mate' && levels.length ? 'mate' : 'move';
+    this.mateLevel = levels[0];
+    // Os recordes (que destravam os níveis) só chegam depois; até lá, o nível salvo fica guardado aqui
+    this.pendingMateLevel = levels.includes(saved.mateLevel) ? saved.mateLevel : null;
 
-      selectEl.addEventListener('change', () => {
+    document.querySelectorAll('.mode-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        if (tab.dataset.mode === this.mode) return;
+        this.pendingMateLevel = null;
+        this.mode = tab.dataset.mode;
         this.generateNextChallenge();
       });
-    }
+    });
+
+    // Só oferece os níveis de mate que têm puzzles cadastrados
+    const listEl = document.querySelector('#mate-levels .mate-levels-list');
+    levels.forEach(n => {
+      const pill = document.createElement('button');
+      pill.type = 'button';
+      pill.className = 'level-pill';
+      pill.dataset.level = n;
+      pill.addEventListener('click', () => {
+        if (n === this.mateLevel || !this.isMateLevelUnlocked(n)) return;
+        this.pendingMateLevel = null;
+        this.mateLevel = n;
+        this.generateNextChallenge();
+      });
+      listEl.appendChild(pill);
+    });
 
     // Campo "Jogo #": mostra o número atual; ao buscar, recria o desafio de movimentação daquele número
     const seedForm = document.getElementById('seed-form');
@@ -185,26 +203,44 @@ class Chess3x3 {
 
   // Com seed, gera aquele jogo de movimentação em vez de um sorteado
   generateNextChallenge({ seed } = {}) {
-    const selectEl = document.getElementById('select-mode');
-    const selectedMode = seed !== undefined || !selectEl ? 'move' : selectEl.value;
+    if (seed !== undefined) this.mode = 'move';
 
     let challenge = null;
-    if (selectedMode.startsWith('mate-')) {
-      const mateInX = parseInt(selectedMode.split('-')[1]);
+    if (this.mode === 'mate') {
+      if (!this.isMateLevelUnlocked(this.mateLevel)) this.mateLevel = this.highestUnlockedLevel();
       const currentId = this.currentChallenge ? this.currentChallenge.id : null;
-      challenge = ChallengeGenerator.getMateChallenge(mateInX, currentId, this.solvedIds());
+      challenge = ChallengeGenerator.getMateChallenge(this.mateLevel, currentId, this.solvedIds());
     }
+    if (!challenge) this.mode = 'move';
     this.currentChallenge = challenge || ChallengeGenerator.generateRandomMoveChallenge({ seed });
     this.mistakes = 0;
     this.pointsAwarded = false;
+    this.saveMode();
 
     this.loadChallenge(this.currentChallenge);
+  }
+
+  // Modo e nível de mate da última visita (só conveniência: sem storage, começa na movimentação)
+  loadSavedMode() {
+    try {
+      return JSON.parse(localStorage.getItem('chessbrain_mode')) || {};
+    } catch {
+      return {};
+    }
+  }
+
+  saveMode() {
+    try {
+      localStorage.setItem('chessbrain_mode', JSON.stringify({ mode: this.mode, mateLevel: this.mateLevel }));
+    } catch {
+      // storage bloqueado: o modo só não é lembrado
+    }
   }
 
   // Botão "Próximo": com todos os jogos do nível de mate resolvidos, passa para o nível seguinte
   goToNext() {
     const nextLevel = this.nextMateLevel();
-    if (nextLevel) document.getElementById('select-mode').value = `mate-${nextLevel}`;
+    if (nextLevel) this.mateLevel = nextLevel;
     this.generateNextChallenge();
   }
 
@@ -215,21 +251,82 @@ class Chess3x3 {
 
   // Nível de mate selecionado, ou null no modo de movimentação
   currentMateLevel() {
-    const mode = document.getElementById('select-mode').value;
-    return mode.startsWith('mate-') ? parseInt(mode.split('-')[1]) : null;
+    return this.mode === 'mate' ? this.mateLevel : null;
+  }
+
+  // Todos os jogos do nível resolvidos?
+  isMateLevelComplete(level) {
+    const solved = this.solvedIds();
+    return ChallengeGenerator.getMatePuzzles(level).every(p => solved.has(p.id));
+  }
+
+  // O primeiro nível está sempre liberado; os outros, só com o anterior completo
+  isMateLevelUnlocked(level) {
+    const levels = ChallengeGenerator.getMateLevels();
+    const index = levels.indexOf(level);
+    return index <= 0 || this.isMateLevelComplete(levels[index - 1]);
+  }
+
+  highestUnlockedLevel() {
+    return ChallengeGenerator.getMateLevels()
+      .filter(n => this.isMateLevelUnlocked(n))
+      .pop();
+  }
+
+  // Com os recordes carregados: volta ao nível salvo se ele estiver liberado,
+  // ou sai de um nível que ficou travado (ex.: depois de sair da conta)
+  applyMateLevelLock() {
+    const wanted = this.pendingMateLevel ?? this.mateLevel;
+    this.pendingMateLevel = null;
+    const level = this.isMateLevelUnlocked(wanted) ? wanted : this.highestUnlockedLevel();
+    if (level === this.mateLevel) return;
+    this.mateLevel = level;
+    if (this.mode === 'mate') this.generateNextChallenge();
+  }
+
+  // Destaca o modo ativo e, no xeque-mate, mostra os níveis com o progresso de cada um
+  renderModeControls() {
+    document.querySelectorAll('.mode-tab').forEach(tab => {
+      const active = tab.dataset.mode === this.mode;
+      tab.classList.toggle('active', active);
+      tab.setAttribute('aria-pressed', active);
+    });
+
+    const levelsEl = document.getElementById('mate-levels');
+    levelsEl.classList.toggle('hidden', this.mode !== 'mate');
+    const solved = this.solvedIds();
+    levelsEl.querySelectorAll('.level-pill').forEach(pill => {
+      const n = Number(pill.dataset.level);
+      const puzzles = ChallengeGenerator.getMatePuzzles(n);
+      const solvedCount = puzzles.filter(p => solved.has(p.id)).length;
+      const complete = solvedCount === puzzles.length;
+      const locked = !this.isMateLevelUnlocked(n);
+      const active = n === this.mateLevel;
+      const name = `Mate em ${n} ${n === 1 ? 'jogada' : 'jogadas'}`;
+      pill.classList.toggle('active', active);
+      pill.classList.toggle('complete', complete);
+      pill.classList.toggle('locked', locked);
+      pill.disabled = locked;
+      pill.setAttribute('aria-pressed', active);
+      const status = locked ? '🔒' : complete ? '✓' : `${solvedCount}/${puzzles.length}`;
+      pill.innerHTML = `<span class="level-number">${n}</span><span class="level-status">${status}</span>`;
+      pill.title = locked
+        ? `Bloqueado: resolva todos os jogos do nível anterior`
+        : `${name}: ${solvedCount} de ${puzzles.length} resolvidos`;
+      pill.setAttribute('aria-label', locked ? `${name}: bloqueado` : pill.title);
+    });
   }
 
   // Nível seguinte quando o atual está todo resolvido; null se ainda faltam jogos ou se é o último
   nextMateLevel() {
     const level = this.currentMateLevel();
-    if (level === null) return null;
-    const solved = this.solvedIds();
-    if (!ChallengeGenerator.getMatePuzzles(level).every(p => solved.has(p.id))) return null;
+    if (level === null || !this.isMateLevelComplete(level)) return null;
     return ChallengeGenerator.getMateLevels().find(n => n > level) || null;
   }
 
   // Barra com um segmento por jogo do nível (preenchido quando resolvido) e o rótulo do botão "Próximo"
   renderMateProgress() {
+    this.renderModeControls();
     const progressEl = document.getElementById('mate-progress');
     const nextBtn = document.getElementById('btn-next');
     const level = this.currentMateLevel();
@@ -631,6 +728,7 @@ class Chess3x3 {
     const recordHint = previousBest && pointsGained > previousBest ? ' Novo recorde neste jogo!' : '';
     if (isMate && !(previousBest >= pointsGained)) {
       this.puzzleBest[puzzleId] = pointsGained;
+      if (!this.currentUser) this.saveGuestBest();
       this.renderBoardLabel();
     }
 
@@ -704,9 +802,10 @@ class Chess3x3 {
     }
   }
 
-  // Carrega as melhores pontuações do jogador logado; visitantes só guardam as desta visita
+  // Carrega as melhores pontuações: do servidor para quem está logado, do navegador para visitantes
+  // (elas também destravam os níveis de mate)
   async fetchPuzzleBest() {
-    this.puzzleBest = {};
+    this.puzzleBest = this.currentUser ? {} : this.loadGuestBest();
     if (this.currentUser) {
       try {
         const res = await fetch('api/puzzle-best');
@@ -715,7 +814,24 @@ class Chess3x3 {
         console.error('Erro ao carregar melhores pontuações:', err);
       }
     }
+    this.applyMateLevelLock();
     this.renderBoardLabel();
+  }
+
+  loadGuestBest() {
+    try {
+      return JSON.parse(localStorage.getItem('chessbrain_guest_best')) || {};
+    } catch {
+      return {};
+    }
+  }
+
+  saveGuestBest() {
+    try {
+      localStorage.setItem('chessbrain_guest_best', JSON.stringify(this.puzzleBest));
+    } catch {
+      // storage bloqueado: o progresso do visitante vale só nesta visita
+    }
   }
 
   // Carrega o Ranking Geral do Servidor

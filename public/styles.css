@@ -59,8 +59,7 @@ body {
 h2,
 h3,
 .board-label,
-.stat-box .label,
-.mode-selector-container label {
+.stat-box .label {
   font-family: var(--font-display);
   letter-spacing: 0.06em;
 }
@@ -208,34 +207,133 @@ h3,
   font-weight: 700;
 }
 
-/* Seletor de Modo de Jogo */
-.mode-selector-container {
+/* Seletor de Modo de Jogo: dois botões lado a lado */
+.mode-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.mode-tab {
+  flex: 1 1 0;
+  max-width: 240px;
+  white-space: nowrap;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: linear-gradient(180deg, #3a2516, #24160c);
+  border: 1px solid #000;
+  box-shadow: 0 0 0 1px rgba(212, 165, 87, 0.25) inset;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.mode-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.mode-tab:hover,
+.mode-tab:focus-visible {
+  outline: none;
+  color: var(--text-color);
+  box-shadow: 0 0 0 1px var(--gold) inset;
+}
+
+.mode-tab.active {
+  background: linear-gradient(180deg, #e7b965 0%, #c48a34 55%, #9c6620 100%);
+  color: #23140a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 245, 210, 0.6),
+    0 3px 8px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 0 rgba(255, 235, 190, 0.45);
+}
+
+/* Níveis do xeque-mate: um botão por nível com o progresso */
+.mate-levels {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-bottom: 14px;
 }
 
-.mode-selector-container label {
+.mate-levels-label {
+  font-family: var(--font-display);
+  letter-spacing: 0.06em;
   font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
-.mode-select {
+.mate-levels-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.level-pill {
+  min-width: 44px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
   font-family: var(--font-body);
-  background: linear-gradient(180deg, #3a2516, #24160c);
   color: var(--text-color);
+  background: #24160c;
   border: 1px solid #000;
-  box-shadow: 0 0 0 1px rgba(212, 165, 87, 0.3) inset;
-  padding: 7px 12px;
-  border-radius: 6px;
-  font-size: 0.92rem;
-  font-weight: 600;
+  box-shadow: 0 0 0 1px rgba(212, 165, 87, 0.25) inset;
+  padding: 5px 8px;
+  border-radius: 8px;
   cursor: pointer;
+}
+
+.level-number {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.level-status {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.level-pill.complete .level-status {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.level-pill.locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.level-pill:not(.locked):hover,
+.level-pill:focus-visible {
   outline: none;
+  box-shadow: 0 0 0 1px var(--gold) inset;
+}
+
+.level-pill.active {
+  background: linear-gradient(180deg, #e7b965 0%, #c48a34 55%, #9c6620 100%);
+  color: #23140a;
+  box-shadow: inset 0 1px 0 rgba(255, 245, 210, 0.6);
+}
+
+.level-pill.active .level-status {
+  color: #3a2410;
 }
 
 .seed-form {
@@ -268,15 +366,6 @@ h3,
 .seed-form .btn-icon {
   display: inline-flex;
   padding: 6px 9px;
-}
-
-.mode-select option {
-  background: var(--wood-dark);
-}
-
-.mode-select:hover,
-.mode-select:focus-visible {
-  box-shadow: 0 0 0 1px var(--gold) inset;
 }
 
 /* Área do Jogo e Tabuleiro */
@@ -679,6 +768,29 @@ button:focus-visible {
 
   #challenge-title {
     font-size: 1.4rem;
+  }
+
+  /* Botões de modo menores e com quebra de linha para caber lado a lado */
+  .mode-tab {
+    min-width: 0;
+    white-space: normal;
+    font-size: 0.82rem;
+    gap: 6px;
+    padding: 8px 10px;
+  }
+
+  .mate-levels {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mate-levels-list {
+    gap: 4px;
+  }
+
+  .level-pill {
+    min-width: 36px;
+    padding: 4px 5px;
   }
 
   .profile-card {

@@ -38,12 +38,19 @@
       <div class="game-header">
         
         <!-- Seletor de Modo de Jogo -->
-        <div class="mode-selector-container">
-          <label for="select-mode">Modo de Desafio</label>
-          <select id="select-mode" class="mode-select">
-            <option value="move">Movimentação Aleatória</option>
-            <!-- Modos de mate gerados a partir de MATE_PUZZLES_DATABASE (script.js) -->
-          </select>
+        <div class="mode-tabs" role="group" aria-label="Modo de desafio">
+          <button type="button" class="mode-tab" data-mode="move" aria-pressed="false">
+            <span class="mode-icon" aria-hidden="true">♞</span> Movimentar peças
+          </button>
+          <button type="button" class="mode-tab" data-mode="mate" aria-pressed="false">
+            <span class="mode-icon" aria-hidden="true">♚</span> Xeque-mate
+          </button>
+        </div>
+
+        <!-- No xeque-mate: um botão por nível, gerado a partir de MATE_PUZZLES_DATABASE (script.js) -->
+        <div id="mate-levels" class="mate-levels hidden" role="group" aria-label="Nível de mate">
+          <span class="mate-levels-label">Mate em</span>
+          <div class="mate-levels-list"></div>
         </div>
 
         <!-- Na movimentação: mostra o número do jogo atual e abre outro pelo número

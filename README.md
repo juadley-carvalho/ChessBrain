@@ -116,7 +116,7 @@ Os testes da API sobem o servidor numa porta aleatória com um banco temporário
 
 ## Como jogar
 
-1. Escolha o modo no seletor **Modo de Desafio**.
+1. Escolha o modo: **Movimentar peças** ou **Xeque-mate**. No xeque-mate, escolha também o nível (mate em 1, 2, 3…); cada nível mostra quantos jogos você já resolveu, e o seguinte só é liberado depois de resolver todos os jogos do atual. O progresso de quem está logado fica no servidor; o de visitantes, no navegador. O último modo usado é lembrado na próxima visita.
 2. Mova as peças brancas clicando na peça e depois na casa de destino, ou arrastando a peça. Pelo teclado, use Tab para entrar no tabuleiro, as setas para mudar de casa e Enter ou Espaço para selecionar e mover (Esc cancela).
 3. **Movimentação:** deixe o tabuleiro igual ao **Objetivo Alvo**.
    **Mate em X:** encontre a sequência de lances que dá xeque‑mate. Um lance errado reinicia o desafio.
